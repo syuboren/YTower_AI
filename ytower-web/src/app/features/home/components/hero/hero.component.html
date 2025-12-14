@@ -1,0 +1,104 @@
+<section class="hero">
+  <!-- Background Decor -->
+  <div class="hero__bg-decor">
+    <div class="hero__bg-circle hero__bg-circle--orange"></div>
+    <div class="hero__bg-circle hero__bg-circle--blue"></div>
+  </div>
+
+  <div class="hero__container">
+    <!-- Left: Text Content & Themes -->
+    <div class="hero__left">
+      <!-- Branding Badge -->
+      <div class="hero__brand">
+        <span class="hero__brand-text">
+          楊桃美食網 | 全台最齊全的食譜網
+        </span>
+      </div>
+
+      <!-- Typewriter Heading -->
+      <h1 class="hero__title">
+        {{ titleLine1() }}<br />
+        <span class="hero__title-line2">
+          {{ titleLine2() }}
+        </span>
+        <span class="hero__cursor">|</span>
+      </h1>
+
+      <!-- Description -->
+      <p class="hero__desc">
+        超過300萬粉絲追蹤，上萬部動態影音示範，讓每道料理，都成為一個陪伴的理由。
+      </p>
+
+      <!-- Recommended Themes Section -->
+      <div class="hero__themes">
+        <div class="hero__themes-header">
+          <h3 class="hero__themes-title">推薦食譜主題</h3>
+          <a routerLink="/recipes/categories" class="hero__themes-link">查看完整主題</a>
+        </div>
+
+        <div class="hero__themes-grid">
+          @for (theme of themes; track theme.slug) {
+            <a [routerLink]="['/recipes/category', theme.slug]" class="hero__theme-card group">
+              <div class="hero__theme-image">
+                <img [src]="theme.img" [alt]="theme.name" loading="lazy" />
+              </div>
+              <div class="hero__theme-label">
+                <div class="hero__theme-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                  </svg>
+                </div>
+                {{ theme.name }}
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Card Stack Animation -->
+    <div 
+      class="hero__right"
+      (mouseenter)="onMouseEnter()"
+      (mouseleave)="onMouseLeave()"
+    >
+      <!-- Single Big Plate Layer (Background) -->
+      <div class="hero__plate">
+        <svg viewBox="0 0 100 100" class="hero__plate-svg">
+          <circle cx="50" cy="50" r="48" fill="#ffffff" />
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#f0f0f0" stroke-width="1"/>
+          <circle cx="50" cy="50" r="32" fill="none" stroke="#e5e5e5" stroke-width="1"/>
+        </svg>
+      </div>
+
+      @for (card of cards; track card.title; let i = $index) {
+        <div
+          class="hero__card"
+          [ngStyle]="getCardStyle(i)"
+          (click)="onCardClick(i)"
+        >
+          <div class="hero__card-image">
+            <img [src]="card.img" [alt]="card.title" loading="lazy" />
+            <div class="hero__card-badge">
+              <span [ngClass]="getBadgeColorClass(card.color)">
+                {{ card.tag }}
+              </span>
+            </div>
+          </div>
+          <div class="hero__card-content">
+            <h3 class="hero__card-title">{{ card.title }}</h3>
+            <p class="hero__card-desc">{{ card.desc }}</p>
+          </div>
+
+          <!-- Progress Bar -->
+          @if (!isHovered() && isCardActive(i)) {
+            <div class="hero__card-progress">
+              <div class="hero__card-progress-bar"></div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>
+

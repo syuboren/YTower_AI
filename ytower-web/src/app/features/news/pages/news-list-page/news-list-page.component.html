@@ -1,0 +1,87 @@
+<div class="news-list-page">
+  <div class="container">
+    <app-breadcrumb [items]="breadcrumbItems" />
+
+    <header class="page-header">
+      <h1 class="page-header__title">最新消息</h1>
+      <p class="page-header__subtitle">掌握楊桃美食網的最新動態與精彩活動</p>
+    </header>
+
+    <div class="content-layout">
+      <!-- Main Content -->
+      <main class="content-main">
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+          @for (cat of categories; track cat.id) {
+            <button 
+              class="category-tab"
+              [class.category-tab--active]="selectedCategory() === cat.id"
+              (click)="selectCategory(cat.id)"
+            >
+              {{ cat.name }}
+            </button>
+          }
+        </div>
+
+        <!-- News Grid -->
+        <div class="news-grid">
+          @for (article of newsArticles(); track article.id) {
+            <article class="news-card">
+              <a [routerLink]="['/news', article.id]" class="news-card__image">
+                <img [src]="article.imageUrl" [alt]="article.title" loading="lazy">
+                <span class="news-card__category">{{ article.category }}</span>
+              </a>
+              <div class="news-card__content">
+                <time class="news-card__date">{{ article.publishDate }}</time>
+                <h2 class="news-card__title">
+                  <a [routerLink]="['/news', article.id]">{{ article.title }}</a>
+                </h2>
+                <p class="news-card__excerpt">{{ article.excerpt }}</p>
+                <a [routerLink]="['/news', article.id]" class="news-card__link">
+                  閱讀更多
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
+            </article>
+          }
+        </div>
+
+        <!-- Pagination -->
+        <nav class="pagination" aria-label="頁面導航">
+          <button 
+            class="pagination__btn" 
+            [disabled]="currentPage() === 1"
+            (click)="currentPage.set(currentPage() - 1)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <span class="pagination__info">{{ currentPage() }} / {{ totalPages }}</span>
+          <button 
+            class="pagination__btn"
+            [disabled]="currentPage() === totalPages"
+            (click)="currentPage.set(currentPage() + 1)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </nav>
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="content-sidebar">
+        <app-sidebar 
+          [title]="'人氣食譜排行榜'"
+          [recipes]="topRecipes()"
+        />
+      </aside>
+    </div>
+  </div>
+
+  <app-cta-section />
+</div>
+

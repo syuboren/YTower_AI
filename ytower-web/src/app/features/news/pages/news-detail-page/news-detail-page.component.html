@@ -1,0 +1,118 @@
+<div class="news-detail-page">
+  <div class="container">
+    <app-breadcrumb [items]="breadcrumbItems()" />
+
+    @if (article(); as article) {
+      <div class="content-layout">
+        <!-- Main Content -->
+        <main class="content-main">
+          <article class="article">
+            <header class="article__header">
+              <span class="article__category">{{ article.category }}</span>
+              <h1 class="article__title">{{ article.title }}</h1>
+              <div class="article__meta">
+                <time class="article__date">發布日期：{{ article.publishDate }}</time>
+              </div>
+            </header>
+
+            <figure class="article__hero">
+              <img [src]="article.imageUrl" [alt]="article.title">
+            </figure>
+
+            <div class="article__content">
+              <p>
+                楊桃美食網全新推出 AI 食譜生成功能！只要輸入您冰箱裡現有的食材，
+                系統將會在幾秒鐘內為您推薦最適合的料理食譜。不論是忙碌的上班族、
+                還是想嘗試新菜色的料理愛好者，都能透過這個智慧功能，輕鬆解決
+                「今天吃什麼」的煩惱。
+              </p>
+
+              <h2>主要功能亮點</h2>
+              <ul>
+                <li>智慧食材辨識：輸入任意食材組合，AI 立即推薦最佳搭配</li>
+                <li>個人化推薦：根據您的口味偏好，提供客製化的料理建議</li>
+                <li>詳細食譜步驟：每道料理都附有完整的烹飪步驟與影片教學</li>
+                <li>廚具推薦：智慧推薦適合的廚房器具，讓烹飪更輕鬆</li>
+              </ul>
+
+              <h2>如何使用</h2>
+              <p>
+                進入 AI 食譜助手頁面，在輸入框中輸入您手邊的食材，例如：
+                「牛肉、洋蔥、馬鈴薯」，點擊「生成食譜」按鈕，AI 將會為您
+                量身打造專屬料理。從今天開始，讓 AI 成為您的私人料理顧問！
+              </p>
+
+              <p>
+                我們期待透過科技的力量，讓更多人享受烹飪的樂趣。如有任何問題或建議，
+                歡迎隨時聯繫我們的客服團隊。
+              </p>
+            </div>
+
+            <!-- Share Buttons -->
+            <div class="article__share">
+              <span class="share-label">分享這篇文章：</span>
+              <div class="share-buttons">
+                <button class="share-btn share-btn--facebook" (click)="shareToFacebook()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                  </svg>
+                  Facebook
+                </button>
+                <button class="share-btn share-btn--line" (click)="shareToLine()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 5.64 2 10.14c0 4.01 3.55 7.37 8.36 8.02.32.07.76.22.87.51.1.26.07.67.03.93l-.14.85c-.04.27-.21 1.05.91.57 1.12-.47 6.05-3.56 8.25-6.1C21.77 12.9 22 11.57 22 10.14 22 5.64 17.52 2 12 2z"/>
+                  </svg>
+                  LINE
+                </button>
+              </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="article__nav">
+              <a routerLink="/news" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                返回最新消息
+              </a>
+            </nav>
+          </article>
+
+          <!-- Other News -->
+          <section class="other-news">
+            <h2 class="section-title">其他最新消息</h2>
+            <div class="other-news__grid">
+              @for (news of otherNews(); track news.id) {
+                <a [routerLink]="['/news', news.id]" class="other-news-card">
+                  <img [src]="news.imageUrl" [alt]="news.title">
+                  <div class="other-news-card__content">
+                    <span class="other-news-card__category">{{ news.category }}</span>
+                    <h3 class="other-news-card__title">{{ news.title }}</h3>
+                    <time class="other-news-card__date">{{ news.publishDate }}</time>
+                  </div>
+                </a>
+              }
+            </div>
+          </section>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="content-sidebar">
+          <app-sidebar 
+            [title]="'人氣食譜排行榜'"
+            [recipes]="topRecipes()"
+          />
+        </aside>
+      </div>
+    } @else {
+      <div class="not-found">
+        <h1>找不到此文章</h1>
+        <p>抱歉，您要找的文章不存在或已被移除。</p>
+        <a routerLink="/news" class="btn">返回最新消息</a>
+      </div>
+    }
+  </div>
+
+  <app-cta-section />
+</div>
+

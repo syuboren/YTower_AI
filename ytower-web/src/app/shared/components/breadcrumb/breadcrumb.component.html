@@ -1,0 +1,18 @@
+<nav class="breadcrumb" aria-label="麵包屑導航">
+  <ol class="breadcrumb__list">
+    <li class="breadcrumb__item">
+      <a routerLink="/" class="breadcrumb__link">首頁</a>
+    </li>
+    @for (item of items(); track item.label; let last = $last) {
+      <li class="breadcrumb__item">
+        <span class="breadcrumb__separator">/</span>
+        @if (item.path && !last) {
+          <a [routerLink]="item.path" class="breadcrumb__link">{{ item.label }}</a>
+        } @else {
+          <span class="breadcrumb__current" aria-current="page">{{ item.label }}</span>
+        }
+      </li>
+    }
+  </ol>
+</nav>
+

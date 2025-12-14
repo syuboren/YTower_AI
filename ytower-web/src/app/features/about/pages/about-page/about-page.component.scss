@@ -1,0 +1,249 @@
+.about-page {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+}
+
+// Hero Section
+.about-hero {
+  padding: 2rem 0 4rem;
+  text-align: center;
+  background: linear-gradient(135deg, #fdf8f6 0%, #fff 100%);
+
+  &__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 1.5rem;
+    line-height: 1.4;
+
+    @media (max-width: 768px) {
+      font-size: 1.75rem;
+    }
+  }
+
+  &__description {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+// Section Titles
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #C45D4A, #F58220);
+    margin-top: 0.5rem;
+  }
+
+  &--center {
+    text-align: center;
+
+    &::after {
+      margin: 0.5rem auto 0;
+    }
+  }
+}
+
+.section-text {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.8;
+  margin: 0;
+}
+
+// About Section (Mission & Vision)
+.about-section {
+  padding: 4rem 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 4rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &--reverse {
+    .about-grid__image {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    &--reverse .about-grid__image {
+      order: 0;
+    }
+  }
+
+  &__text {
+    padding: 1rem 0;
+  }
+
+  &__image {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  }
+}
+
+// Core Values
+.about-values {
+  padding: 4rem 0;
+  background: #fdf8f6;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.value-card {
+  text-align: center;
+  padding: 2rem;
+
+  &__icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(196, 93, 74, 0.15);
+    color: #C45D4A;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #C45D4A;
+    margin: 0 0 1rem;
+  }
+
+  &__description {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
+  }
+}
+
+// Services
+.about-services {
+  padding: 4rem 0;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.service-card {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C45D4A;
+  }
+
+  &__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 0.75rem;
+    text-decoration: underline;
+    text-decoration-color: #C45D4A;
+    text-underline-offset: 4px;
+  }
+
+  &__description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
+  }
+}
+
+// Brand Story
+.about-story {
+  padding: 4rem 0;
+  background: #fdf8f6;
+}
+
+.story-content {
+  max-width: 800px;
+  margin: 2rem auto 0;
+  text-align: center;
+
+  p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.9;
+    margin: 0 0 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+

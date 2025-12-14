@@ -1,0 +1,547 @@
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+// --- 資料介面定義 ---
+interface CardData {
+  id?: number | string;
+  name: string;
+  img: string;
+  type?: string;
+  element?: string; // Ingredient Attribute
+  attr?: string;    // Recipe Attribute
+  rarity?: string;
+  atk: number;
+  def: number;
+  stars?: number;
+  desc?: string;
+  tags?: string[];
+  gradient?: string;
+  imgError?: boolean;
+}
+
+// --- 模擬資料庫 ---
+const INGREDIENT_DB: Record<string, any> = {
+  '雞蛋': { img: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80', type: '蛋白', element: '光', rarity: 'N', atk: 500, def: 500, gradient: 'from-yellow-400 to-yellow-600' },
+  '牛肉': { img: 'https://images.unsplash.com/photo-1603048297172-c92544798d5e?auto=format&fit=crop&q=80', type: '肉類', element: '炎', rarity: 'SR', atk: 1800, def: 1200, gradient: 'from-red-500 to-red-800' },
+  '番茄': { img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80', type: '蔬菜', element: '水', rarity: 'N', atk: 800, def: 1000, gradient: 'from-red-400 to-orange-500' },
+  '洋蔥': { img: 'https://images.unsplash.com/photo-1620574387735-3624d75b2dbc?auto=format&fit=crop&q=80', type: '蔬菜', element: '地', rarity: 'N', atk: 600, def: 900, gradient: 'from-green-300 to-emerald-600' },
+  '義大利麵': { img: 'https://images.unsplash.com/photo-1551462147-37885acc36f1?auto=format&fit=crop&q=80', type: '主食', element: '風', rarity: 'R', atk: 1100, def: 800, gradient: 'from-amber-200 to-amber-500' },
+  'default': { img: '', type: '未知', element: '暗', rarity: '?', atk: 500, def: 500, gradient: 'from-gray-600 to-gray-900' }
+};
+
+const RECIPE_RESULTS: CardData[] = [
+  {
+    id: 'R1',
+    name: '紅酒燉牛肉',
+    stars: 5,
+    atk: 3200,
+    def: 2500,
+    desc: '融合了時間與耐心的究極料理，濃郁的湯汁能治癒人心。',
+    img: 'https://images.unsplash.com/photo-1534939561126-855b8675edd7?auto=format&fit=crop&q=80',
+    tags: ['慢燉', '法式'],
+    attr: '神',
+    element: '神',
+    gradient: 'from-purple-600 to-indigo-900'
+  },
+  {
+    id: 'R2',
+    name: '滑蛋茄汁牛',
+    stars: 3,
+    atk: 2100,
+    def: 1800,
+    desc: '酸甜的番茄與滑嫩的雞蛋交織，家常戰場的常勝軍。',
+    img: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80',
+    tags: ['快速', '下飯'],
+    attr: '地',
+    element: '地',
+    gradient: 'from-orange-400 to-red-600'
+  },
+  {
+    id: 'R3',
+    name: '元氣牛肉湯',
+    stars: 4,
+    atk: 1500,
+    def: 3000,
+    desc: '清澈卻深厚的湯頭，擁有極高的回復效果。',
+    img: 'https://images.unsplash.com/photo-1577515587354-8a8155c3c6b4?auto=format&fit=crop&q=80',
+    tags: ['暖胃', '低卡'],
+    attr: '水',
+    element: '水',
+    gradient: 'from-cyan-500 to-blue-700'
+  }
+];
+
+// ----------------------------------------------------------------------
+// 子組件: Game Card (移除 export 以避免被錯誤識別為 root)
+// ----------------------------------------------------------------------
+@Component({
+  selector: 'app-game-card',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div 
+      (click)="onClick.emit()"
+      class="relative shrink-0 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 group bg-[#1a1b26] text-white animate-fade-in-up"
+      [ngClass]="{
+        'w-64 h-96 border-[6px]': isMonster,
+        'w-40 h-56 border-4': !isMonster,
+        'translate-y-[-20px] shadow-[0_0_30px_rgba(250,204,21,0.6)] border-yellow-400 z-20': isSelected,
+        'hover:translate-y-[-10px] border-gray-600 hover:border-gray-400 shadow-xl': !isSelected
+      }"
+      [style.animationDelay]="animationDelay + 's'"
+    >
+      <!-- 卡片頭部 -->
+      <div class="flex justify-between items-center px-2 py-1 bg-gradient-to-b from-gray-800 to-gray-900 border-b border-gray-600">
+        <span class="font-bold truncate tracking-wider" [ngClass]="isMonster ? 'text-lg' : 'text-xs'">
+          {{ data.name }}
+        </span>
+        <div class="flex items-center gap-1 bg-black/40 px-1.5 rounded-full border border-gray-600">
+          <ng-container *ngTemplateOutlet="iconTemplate; context: { type: data.element || data.attr || 'default', size: 14 }"></ng-container>
+          <span class="text-[10px] font-mono">{{ data.element || data.attr }}</span>
+        </div>
+      </div>
+
+      <!-- 星級 (僅食譜有) -->
+      <div *ngIf="isMonster" class="flex justify-end px-2 py-1 gap-1 bg-black/80">
+         <div *ngFor="let star of [].constructor(data.stars); let i = index" 
+              class="w-4 h-4 rounded-full bg-gradient-to-tr from-orange-500 to-yellow-300 shadow-[0_0_5px_rgba(250,204,21,0.8)] border border-yellow-100">
+         </div>
+      </div>
+
+      <!-- 卡圖區域 (支援圖片錯誤 Fallback) -->
+      <div class="relative w-full bg-gray-900 overflow-hidden border-y-2 border-gray-700" [ngClass]="isMonster ? 'h-48' : 'h-24'">
+         <ng-container *ngIf="!imgError && data.img; else fallbackImg">
+           <img 
+             [src]="data.img" 
+             [alt]="data.name" 
+             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+             (error)="onImgError()"
+           />
+         </ng-container>
+         <ng-template #fallbackImg>
+           <div class="w-full h-full bg-gradient-to-br flex items-center justify-center" [ngClass]="data.gradient || 'from-gray-700 to-gray-900'">
+              <ng-container *ngTemplateOutlet="iconTemplate; context: { type: data.element || data.attr || 'default', size: 48, opacity: 0.5 }"></ng-container>
+           </div>
+         </ng-template>
+         
+         <!-- 稀有度閃光效果 -->
+         <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      </div>
+
+      <!-- 卡片描述與數值 -->
+      <div class="p-2 space-y-2 bg-gradient-to-b from-gray-800 to-[#121212] h-full flex flex-col">
+         <div class="text-[10px] text-gray-400 font-mono flex gap-2">
+            <span class="font-bold text-gray-200">[{{ data.type || '料理' }}]</span>
+            <span *ngFor="let t of data.tags">#{{t}}</span>
+         </div>
+         
+         <p class="text-gray-300 leading-relaxed line-clamp-3 flex-1" [ngClass]="isMonster ? 'text-xs' : 'text-[10px]'">
+           {{ isMonster ? data.desc : '可作為融合素材的基礎食材，蘊含著未知的美味潛力。' }}
+         </p>
+
+         <div class="border-t border-gray-600 pt-2 flex justify-between items-center font-mono mt-auto">
+            <div class="flex items-center gap-1 text-red-400">
+               <!-- Sword Icon -->
+               <svg xmlns="http://www.w3.org/2000/svg" [attr.width]="isMonster ? 16 : 12" [attr.height]="isMonster ? 16 : 12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg>
+               <span class="font-bold text-lg">{{ data.atk }}</span>
+            </div>
+            <div class="flex items-center gap-1 text-blue-400">
+               <!-- Shield Icon -->
+               <svg xmlns="http://www.w3.org/2000/svg" [attr.width]="isMonster ? 16 : 12" [attr.height]="isMonster ? 16 : 12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+               <span class="font-bold text-lg">{{ data.def }}</span>
+            </div>
+         </div>
+      </div>
+    </div>
+
+    <!-- Icons Template -->
+    <ng-template #iconTemplate let-type="type" let-size="size" let-opacity="opacity">
+      <div [style.opacity]="opacity || 1">
+        <!-- Fire -->
+        <svg *ngIf="type === '炎'" xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <!-- Water -->
+        <svg *ngIf="type === '水'" xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+        <!-- Earth -->
+        <svg *ngIf="type === '地'" xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <!-- Wind -->
+        <svg *ngIf="type === '風'" xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.77 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+        <!-- Light/Default -->
+        <svg *ngIf="type !== '炎' && type !== '水' && type !== '地' && type !== '風' && type !== 'default'" xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 5H5"/><path d="M19 19v4"/><path d="M19 19h-4"/></svg>
+        <!-- Unknown/Help -->
+        <svg *ngIf="type === 'default'" xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      </div>
+    </ng-template>
+  `,
+  styles: [`
+    .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  `]
+})
+class GameCardComponent {
+  @Input() data!: CardData;
+  @Input() type: 'INGREDIENT' | 'RECIPE' = 'INGREDIENT';
+  @Input() isSelected: boolean = false;
+  @Input() animationDelay: number = 0;
+  @Output() onClick = new EventEmitter<void>();
+
+  imgError = false;
+
+  get isMonster() {
+    return this.type === 'RECIPE';
+  }
+
+  onImgError() {
+    this.imgError = true;
+  }
+}
+
+// ----------------------------------------------------------------------
+// 主組件: App (Kitchen Summoner)
+// ----------------------------------------------------------------------
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, GameCardComponent],
+  template: `
+    <div class="relative w-full h-screen bg-[#050505] overflow-hidden font-sans flex flex-col items-center">
+      
+      <!-- 背景特效 -->
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#1e1b4b_0%,_#000000_100%)]"></div>
+        <div class="absolute inset-0 opacity-20 animate-pulse bg-stardust"></div>
+        <div class="absolute w-full h-full perspective-grid"></div>
+      </div>
+
+      <!-- 頂部 HUD -->
+      <div class="z-10 w-full max-w-6xl px-6 py-4 flex justify-between items-center border-b border-white/10 bg-black/40 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-yellow-500 rounded text-black font-black">
+            <!-- Zap Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h1 class="text-xl font-bold text-white tracking-widest uppercase">Kitchen Summoner <span class="text-yellow-500 text-xs">v2.1</span></h1>
+        </div>
+        <div class="flex gap-4 text-xs font-mono text-gray-400">
+           <div>MODE: <span class="text-green-400">FUSION</span></div>
+           <div>SYSTEM: <span class="text-green-400">ONLINE</span></div>
+        </div>
+      </div>
+
+      <!-- --- 主遊戲區域 --- -->
+      <div class="flex-1 w-full max-w-6xl relative flex flex-col items-center justify-center p-4">
+        
+        <!-- 狀態一：輸入與準備 (INPUT) -->
+        <div *ngIf="gameState === 'INPUT'" class="w-full h-full flex flex-col items-center justify-between animate-fade-in relative">
+            
+            <!-- 融合召喚陣 (Drop Zone) -->
+            <div class="flex-1 w-full flex items-center justify-center">
+               <div class="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px]">
+                  <!-- 魔法陣外圈 -->
+                  <div class="absolute inset-0 border-2 border-dashed rounded-full animate-spin-slow"
+                       [ngClass]="selectedCards.length > 0 ? 'border-yellow-500 opacity-60' : 'border-gray-700 opacity-30'"></div>
+                  <div class="absolute inset-8 border border-gray-600 rounded-full animate-spin-reverse opacity-40"></div>
+                  
+                  <!-- 中心觸發按鈕 -->
+                  <div class="absolute inset-0 flex items-center justify-center z-20">
+                     <ng-container *ngIf="selectedCards.length >= 2; else emptyState">
+                       <button (click)="startFusion()" class="relative group cursor-pointer">
+                         <div class="absolute inset-0 bg-yellow-500 blur-xl opacity-40 group-hover:opacity-60 animate-pulse"></div>
+                         <div class="relative w-32 h-32 rounded-full bg-gradient-to-br from-yellow-400 to-orange-600 flex flex-col items-center justify-center shadow-2xl border-4 border-yellow-200 transform transition-transform group-hover:scale-110 active:scale-95">
+                            <!-- Sparkles Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="text-white w-10 h-10 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 5H5"/><path d="M19 19v4"/><path d="M19 19h-4"/></svg>
+                            <span class="text-white font-black text-sm mt-1 tracking-widest">FUSION</span>
+                         </div>
+                       </button>
+                     </ng-container>
+                     <ng-template #emptyState>
+                       <div class="text-gray-500 text-center pointer-events-none">
+                          <p class="text-xs font-mono tracking-widest mb-2">AWAITING MATERIALS</p>
+                          <div class="flex gap-1 justify-center">
+                             <div *ngFor="let i of [0, 1, 2]" class="w-3 h-3 rounded-full" [ngClass]="i < selectedCards.length ? 'bg-yellow-500' : 'bg-gray-800'"></div>
+                          </div>
+                       </div>
+                     </ng-template>
+                  </div>
+
+                  <!-- 選中的卡片漂浮在魔法陣上 -->
+                  <div *ngFor="let card of selectedCards; let idx = index" 
+                       class="absolute w-20 h-28 bg-gray-900 border-2 border-yellow-500 rounded-lg shadow-[0_0_15px_rgba(250,204,21,0.5)] z-10 overflow-hidden animate-float"
+                       [style.left]="getCardPos(idx, selectedCards.length).left"
+                       [style.top]="getCardPos(idx, selectedCards.length).top">
+                         <img *ngIf="card.img && !card.imgError" [src]="card.img" class="w-full h-full object-cover opacity-80" (error)="card.imgError = true">
+                         <div *ngIf="!card.img || card.imgError" class="w-full h-full bg-gradient-to-br opacity-80" [ngClass]="card.gradient || 'from-gray-700 to-gray-800'"></div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- 手牌區 (Hand) + 輸入框 -->
+            <div class="w-full bg-black/60 backdrop-blur-xl border-t border-gray-800 p-6 z-30 rounded-t-3xl shadow-2xl h-[450px]">
+               
+               <!-- 輸入轉化區 -->
+               <div class="max-w-xl mx-auto mb-4 relative">
+                 <form (submit)="handleAddIngredient($event)" class="relative z-10">
+                   <input 
+                     type="text" 
+                     name="ingredient"
+                     [(ngModel)]="inputValue"
+                     [disabled]="isProcessing"
+                     [placeholder]="isProcessing ? 'MATERIALIZING...' : '輸入冰箱食材 (例: 牛肉)...'"
+                     class="w-full bg-gray-900/80 border-2 border-gray-700 text-white px-6 py-4 rounded-full focus:outline-none focus:border-yellow-500 focus:shadow-[0_0_20px_rgba(250,204,21,0.3)] transition-all font-bold text-lg placeholder:text-gray-600 disabled:opacity-50"
+                   />
+                   <button 
+                     type="submit"
+                     [disabled]="!inputValue || isProcessing"
+                     class="absolute right-2 top-2 bottom-2 bg-gray-700 hover:bg-gray-600 text-white px-6 rounded-full font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                   >
+                     <!-- Conditional Icon -->
+                     <ng-container *ngIf="isProcessing; else plusIcon">
+                        <!-- RotateCw Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/><path d="M3 3v9h9"/></svg>
+                     </ng-container>
+                     <ng-template #plusIcon>
+                        <!-- Plus Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                     </ng-template>
+                     <span>{{ isProcessing ? '生成中' : '轉化' }}</span>
+                   </button>
+                 </form>
+               </div>
+
+               <!-- 卡片橫向捲動區 -->
+               <div class="relative h-full">
+                 <div class="text-xs text-gray-500 font-bold mb-2 uppercase tracking-wider flex justify-between px-2">
+                    <span>Hand Inventory ({{ hand.length }})</span>
+                    <span>Select up to 3 materials</span>
+                 </div>
+                 
+                 <div #handContainer class="flex gap-4 overflow-x-auto overflow-y-visible pt-8 pb-12 px-4 scrollbar-hide items-start h-full">
+                    <div *ngIf="hand.length === 0 && !isProcessing" class="w-full text-center text-gray-600 py-10 border-2 border-dashed border-gray-800 rounded-xl mt-4">
+                        輸入食材以具現化卡片...
+                    </div>
+                    
+                    <!-- --- 新的轉化動畫 (Materializing Card) --- -->
+                    <div *ngIf="isProcessing" class="w-40 h-56 shrink-0 rounded-xl bg-gray-900/80 border-2 border-yellow-500/50 flex flex-col items-center justify-center relative overflow-hidden shadow-[0_0_15px_rgba(250,204,21,0.3)] animate-pulse">
+                         <div class="absolute top-0 left-0 w-full h-2 bg-yellow-400 shadow-[0_0_20px_rgba(250,204,21,1)] animate-scan z-20"></div>
+                         <div class="absolute inset-0 opacity-20 bg-grid-yellow"></div>
+                         <!-- Hexagon Icon -->
+                         <svg xmlns="http://www.w3.org/2000/svg" class="text-yellow-500 animate-spin-slow mb-4 opacity-80" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                         <div class="text-xs text-yellow-400 font-mono tracking-widest font-bold animate-pulse">ANALYZING...</div>
+                    </div>
+
+                    <!-- 已生成的卡片 -->
+                    <app-game-card 
+                         *ngFor="let card of hand" 
+                         [data]="card" 
+                         [isSelected]="isSelected(card)"
+                         (onClick)="toggleSelectCard(card)"
+                         [animationDelay]="0">
+                    </app-game-card>
+                    
+                    <!-- 佔位符 -->
+                    <div class="w-4 shrink-0"></div>
+                 </div>
+               </div>
+            </div>
+        </div>
+
+        <!-- 狀態二：融合過場 (FUSING) -->
+        <div *ngIf="gameState === 'FUSING'" class="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+              <div class="relative w-full h-full flex flex-col items-center justify-center">
+                 <div class="absolute w-[600px] h-[600px] conic-gradient animate-spin-slow opacity-50 blur-3xl"></div>
+                 <div class="relative z-10 w-40 h-56 bg-white animate-ping-slow"></div>
+                 <h2 class="mt-12 text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-purple-400 animate-pulse tracking-widest z-20">FUSION SUMMON</h2>
+                 <p class="text-purple-300 font-mono mt-2 z-20">ANALYZING COMBINATION...</p>
+              </div>
+        </div>
+
+        <!-- 狀態三：結果展示 (RESULT) -->
+        <div *ngIf="gameState === 'RESULT'" class="w-full h-full flex flex-col items-center justify-center animate-fade-in z-40">
+             <div class="text-center mb-8">
+               <h2 class="text-4xl font-bold text-white mb-2 text-shadow-glow">召喚成功</h2>
+               <p class="text-gray-400">AI 根據您的素材，具現化了以下食譜</p>
+             </div>
+
+             <div class="flex flex-col md:flex-row gap-8 items-center justify-center perspective-1000">
+                <app-game-card 
+                   *ngFor="let recipe of recipes; let idx = index"
+                   [data]="recipe"
+                   type="RECIPE"
+                   [animationDelay]="idx * 0.2">
+                </app-game-card>
+             </div>
+
+             <div class="mt-12 flex gap-4">
+                <button (click)="resetGame()" class="px-8 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-full font-bold flex items-center gap-2 transition-colors">
+                  <!-- RotateCcw Icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/><path d="M3 3v9h9"/></svg>
+                  重置戰場
+                </button>
+             </div>
+        </div>
+
+      </div>
+    </div>
+  `,
+  styles: [`
+    .bg-stardust {
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+    .perspective-grid {
+      background: linear-gradient(transparent 95%, #4f46e5 95%);
+      background-size: 100% 40px;
+      opacity: 0.1;
+      transform: perspective(500px) rotateX(60deg) scale(2);
+    }
+    .bg-grid-yellow {
+      background-image: linear-gradient(#eab308 1px, transparent 1px), linear-gradient(90deg, #eab308 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .conic-gradient {
+      background: conic-gradient(from 0deg, transparent, purple, transparent);
+    }
+    .text-shadow-glow {
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    /* Animations */
+    .animate-spin-slow { animation: spin 20s linear infinite; }
+    .animate-spin-reverse { animation: spin 15s linear infinite reverse; }
+    .animate-ping-slow { animation: ping 0.5s ease-in-out infinite; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-scan { animation: scan 1.5s linear infinite; }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes scan {
+      0% { top: 0%; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  `]
+})
+export class App {
+  inputValue = '';
+  hand: CardData[] = [];
+  selectedCards: CardData[] = [];
+  gameState: 'INPUT' | 'FUSING' | 'RESULT' = 'INPUT';
+  recipes: CardData[] = [];
+  isProcessing = false;
+
+  @ViewChild('handContainer') handContainer!: ElementRef<HTMLDivElement>;
+
+  // 1. 新增食材到手牌
+  handleAddIngredient(e?: Event) {
+    e?.preventDefault();
+    if (!this.inputValue.trim()) return;
+
+    this.isProcessing = true;
+    const keyword = this.inputValue.trim();
+    this.inputValue = ''; 
+
+    // 延長時間到 1.5 秒
+    setTimeout(() => {
+      // 模擬邏輯
+      const dbKey = Object.keys(INGREDIENT_DB).find(k => keyword.includes(k));
+      const dbEntry = dbKey ? INGREDIENT_DB[dbKey] : {
+         ...INGREDIENT_DB['default'],
+         element: ['炎','水','地','風'][Math.floor(Math.random()*4)],
+         gradient: ['from-red-900 to-red-600', 'from-blue-900 to-blue-600', 'from-amber-900 to-amber-600', 'from-green-900 to-green-600'][Math.floor(Math.random()*4)]
+      };
+      
+      const newCard: CardData = {
+        id: Date.now(),
+        name: keyword,
+        ...dbEntry
+      };
+
+      this.hand = [...this.hand, newCard];
+      this.isProcessing = false;
+      
+      // Auto scroll
+      setTimeout(() => {
+        if(this.handContainer?.nativeElement) {
+          this.handContainer.nativeElement.scrollTo({
+             left: this.handContainer.nativeElement.scrollWidth,
+             behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }, 1500); 
+  }
+
+  // 2. 選擇融合素材
+  toggleSelectCard(card: CardData) {
+    if (this.gameState !== 'INPUT') return;
+    
+    if (this.selectedCards.find(c => c.id === card.id)) {
+      this.selectedCards = this.selectedCards.filter(c => c.id !== card.id);
+    } else if (this.selectedCards.length < 3) {
+      this.selectedCards = [...this.selectedCards, card];
+    }
+  }
+
+  isSelected(card: CardData): boolean {
+    return this.selectedCards.some(c => c.id === card.id);
+  }
+
+  getCardPos(idx: number, total: number) {
+    const angle = (idx * 360) / total;
+    const radius = 140; // distance from center
+    const rad = (angle - 90) * (Math.PI / 180);
+    const x = Math.cos(rad) * radius;
+    const y = Math.sin(rad) * radius;
+    
+    // left: calc(50% + x px - 40px), top: calc(50% + y px - 56px)
+    // 40px is half card width, 56px is half card height
+    return {
+      left: `calc(50% + ${x}px - 40px)`,
+      top: `calc(50% + ${y}px - 56px)`
+    };
+  }
+
+  // 3. 發動融合
+  startFusion() {
+    if (this.selectedCards.length < 2) return;
+    this.gameState = 'FUSING';
+    
+    setTimeout(() => {
+      this.gameState = 'RESULT';
+      this.recipes = RECIPE_RESULTS;
+    }, 3000);
+  }
+
+  resetGame() {
+    this.gameState = 'INPUT';
+    this.selectedCards = [];
+    this.recipes = [];
+  }
+}

@@ -1,0 +1,99 @@
+.footer {
+  background: #f9fafb;
+  padding-top: 3rem;
+
+  &__main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: 2fr 3fr;
+    }
+  }
+
+  &__brand {
+    &-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+  }
+
+  &__logo {
+    display: inline-block;
+    margin-bottom: 1rem;
+
+    &-img {
+      height: 48px;
+      width: auto;
+    }
+  }
+
+  &__company-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.8;
+  }
+
+  &__links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__section {
+    h4 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    a {
+      font-size: 0.875rem;
+      color: #6b7280;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #F58220;
+      }
+
+      &::before {
+        content: '・';
+        color: #d1d5db;
+        margin-right: 0.25rem;
+      }
+    }
+  }
+
+  &__copyright {
+    padding: 1.5rem 0;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+
+    p {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+  }
+}
+

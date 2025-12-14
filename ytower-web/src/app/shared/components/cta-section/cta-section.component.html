@@ -1,0 +1,33 @@
+<section class="cta-section">
+  <div class="cta-section__container">
+    @if (showShoppingCta()) {
+      <div class="cta-card cta-card--shopping">
+        <h3 class="cta-card__title">讓料理更順手，開啟專屬的美味日常</h3>
+        <p class="cta-card__description">
+          料理不只是柴米油鹽上的功夫，選對廚房器具能讓烹飪過程更輕鬆有效率！
+          我們精選高品質廚具，結合多年一線料理經驗的好伙伴。
+          從廚房工具到美味食材，點點滑鼠就能輕鬆購入你的烹飪必備。
+        </p>
+        <a href="https://shop.ytower.com.tw" target="_blank" rel="noopener" class="cta-card__button">
+          前往楊桃購物網
+        </a>
+      </div>
+    }
+
+    @if (showContactCta()) {
+      <div class="cta-card cta-card--contact">
+        <h3 class="cta-card__title">把想說的話告訴我們</h3>
+        <p class="cta-card__description">
+          無論是合作洽談，或是其上的問題：
+          只要是對料理的熱情、對食材的好奇、對鍋具的追求？只要是您心中的疑惑，
+          歡迎隨時透過聯絡表單告訴我們，讓專業幫您解答！
+          我們會盡快回覆每一位對烹飪有興趣的夥伴朋友。
+        </p>
+        <a routerLink="/contact" class="cta-card__button cta-card__button--outline">
+          立即聯絡楊桃團隊
+        </a>
+      </div>
+    }
+  </div>
+</section>
+

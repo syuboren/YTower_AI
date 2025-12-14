@@ -1,0 +1,195 @@
+.hero {
+  @apply relative w-full min-h-screen bg-[#f8f9fa] flex items-center justify-center overflow-hidden;
+  font-family: 'Noto Sans TC', sans-serif;
+
+  // Background Decoration
+  &__bg-decor {
+    @apply absolute w-full h-full overflow-hidden pointer-events-none;
+  }
+
+  &__bg-circle {
+    @apply absolute w-1/2 h-1/2 rounded-full opacity-40;
+    filter: blur(100px);
+
+    &--orange {
+      @apply top-[-10%] left-[-10%] bg-orange-100;
+    }
+
+    &--blue {
+      @apply bottom-[-10%] right-[-10%] bg-blue-100;
+    }
+  }
+
+  // Container
+  &__container {
+    @apply relative z-10 w-full max-w-7xl px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-20;
+  }
+
+  // Left Section
+  &__left {
+    @apply flex-1 text-left z-20 flex flex-col justify-center h-full pt-10 lg:pt-0;
+  }
+
+  // Brand
+  &__brand {
+    @apply mb-6;
+  }
+
+  &__brand-text {
+    @apply text-xl md:text-2xl font-bold text-terracotta tracking-wide border-l-4 border-terracotta pl-4;
+  }
+
+  // Title
+  &__title {
+    @apply text-4xl md:text-6xl font-black text-gray-900 leading-tight min-h-[100px] mb-4;
+  }
+
+  &__title-line2 {
+    @apply text-gray-800;
+  }
+
+  &__cursor {
+    @apply text-terracotta animate-pulse;
+  }
+
+  // Description
+  &__desc {
+    @apply text-gray-600 text-lg max-w-lg mb-8 leading-relaxed font-medium;
+  }
+
+  // Themes Section
+  &__themes {
+    @apply w-full max-w-lg mt-4;
+  }
+
+  &__themes-header {
+    @apply flex justify-between items-baseline mb-4;
+  }
+
+  &__themes-title {
+    @apply text-xl font-bold text-gray-800;
+  }
+
+  &__themes-link {
+    @apply text-sm text-terracotta hover:text-terracotta-600 underline underline-offset-4 transition-colors;
+  }
+
+  &__themes-grid {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  &__theme-card {
+    @apply cursor-pointer block;
+  }
+
+  &__theme-image {
+    @apply h-24 w-full rounded-lg mb-3 overflow-hidden relative bg-gray-200 transition-all duration-300;
+
+    .group:hover & {
+      @apply shadow-md;
+    }
+
+    img {
+      @apply w-full h-full object-cover transition-transform duration-500;
+
+      .group:hover & {
+        @apply scale-105;
+      }
+    }
+  }
+
+  &__theme-label {
+    @apply flex items-center gap-2 text-gray-600 font-bold transition-colors;
+
+    .group:hover & {
+      @apply text-terracotta;
+    }
+  }
+
+  &__theme-icon {
+    @apply w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 transition-all;
+
+    .group:hover & {
+      @apply bg-terracotta text-white;
+    }
+  }
+
+  // Right Section (Card Stack)
+  &__right {
+    @apply flex-1 h-[600px] w-full flex items-center justify-center relative;
+    perspective: 1200px;
+  }
+
+  // Plate
+  &__plate {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] z-0 pointer-events-none flex items-center justify-center;
+  }
+
+  &__plate-svg {
+    @apply w-full h-full drop-shadow-2xl opacity-90;
+  }
+
+  // Card
+  &__card {
+    @apply absolute w-72 md:w-80 bg-white rounded-3xl shadow-xl p-4 border border-gray-100;
+    height: 420px;
+    transition: all 0.5s ease-out;
+
+    &:hover {
+      z-index: 50 !important;
+    }
+  }
+
+  &__card-image {
+    @apply w-full h-52 rounded-2xl overflow-hidden mb-5 relative bg-gray-100 z-10;
+
+    img {
+      @apply w-full h-full object-cover;
+    }
+  }
+
+  &__card-badge {
+    @apply absolute top-3 right-3;
+
+    span {
+      @apply px-3 py-1 rounded-full text-xs font-bold border shadow-sm;
+      backdrop-filter: blur(8px);
+    }
+  }
+
+  &__card-content {
+    @apply px-2 relative z-10;
+  }
+
+  &__card-title {
+    @apply text-xl font-black text-gray-800 mb-2;
+  }
+
+  &__card-desc {
+    @apply text-gray-500 text-sm leading-relaxed font-medium;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  // Progress Bar
+  &__card-progress {
+    @apply absolute bottom-0 left-0 w-full h-1.5 bg-gray-100 rounded-b-3xl overflow-hidden z-20;
+  }
+
+  &__card-progress-bar {
+    @apply h-full bg-terracotta;
+    animation: progress 2.5s linear infinite;
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+

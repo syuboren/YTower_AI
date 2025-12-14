@@ -1,0 +1,519 @@
+<div class="ai-assistant-page">
+  <!-- Breadcrumb -->
+  <div class="container">
+    <app-breadcrumb [items]="breadcrumbItems" />
+  </div>
+
+  <!-- AI Hero Section -->
+  <section class="ai-hero">
+    <!-- 背景裝飾 -->
+    <div class="ai-hero__bg">
+      <div class="ai-hero__bg-gradient"></div>
+      <div class="ai-hero__bg-circle ai-hero__bg-circle--1"></div>
+      <div class="ai-hero__bg-circle ai-hero__bg-circle--2"></div>
+    </div>
+
+    <div class="container">
+      <!-- INPUT 狀態 -->
+      @if (gameState() === 'INPUT') {
+        <div class="game-input">
+          <div class="game-input__layout">
+            <!-- 左側：烹飪區 -->
+            <div class="cooking-zone">
+              <!-- 鍋子 -->
+              <div class="pot-container">
+                <div class="pot">
+                  <!-- 鍋子 SVG -->
+                  <svg class="pot__svg" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 鍋身 -->
+                    <ellipse cx="60" cy="70" rx="55" ry="8" fill="#8B7355"/>
+                    <path d="M10 30 Q10 70 60 70 Q110 70 110 30 L110 30 Q110 40 60 45 Q10 40 10 30Z" fill="url(#potGradient)"/>
+                    <ellipse cx="60" cy="30" rx="50" ry="12" fill="#C45D4A"/>
+                    <!-- 把手 -->
+                    <rect x="0" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
+                    <rect x="105" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
+                    <defs>
+                      <linearGradient id="potGradient" x1="60" y1="30" x2="60" y2="70" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#C45D4A"/>
+                        <stop offset="100%" stop-color="#8B4513"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+
+                  <!-- 選中的食材圖示（會跳入鍋中） -->
+                  @for (card of selectedCards(); track card.id; let idx = $index) {
+                    <div
+                      class="ingredient-icon"
+                      [style.left]="getCardPosition(idx, selectedCards().length).left"
+                      [style.top]="getCardPosition(idx, selectedCards().length).top"
+                    >
+                      <!-- 食材圖示 SVG -->
+                      <svg class="ingredient-icon__svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" [attr.fill]="getElementColor(card.element)" fill-opacity="0.2"/>
+                        <circle cx="20" cy="20" r="14" [attr.fill]="getElementColor(card.element)"/>
+                        <text x="20" y="25" text-anchor="middle" fill="white" font-size="12" font-weight="bold">{{ card.name.charAt(0) }}</text>
+                      </svg>
+                      <span class="ingredient-icon__name">{{ card.name }}</span>
+                    </div>
+                  }
+                </div>
+
+                <!-- 中心操作區 -->
+                <div class="pot-action">
+                  @if (selectedCards().length >= 2) {
+                    <button type="button" class="cook-btn" (click)="startFusion()">
+                      <!-- 火焰 Icon -->
+                      <svg class="cook-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                      </svg>
+                      <span class="cook-btn__text">開始烹飪</span>
+                    </button>
+                  } @else {
+                    <div class="pot-hint">
+                      <p class="pot-hint__text">選擇 2-3 種食材</p>
+                      <div class="pot-hint__dots">
+                        @for (i of [0, 1, 2]; track i) {
+                          <span class="pot-hint__dot" [class.pot-hint__dot--active]="i < selectedCards().length"></span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 右側：說明文字 -->
+            <div class="game-input__info">
+              <h1 class="game-input__title">AI 食譜生成助手</h1>
+              <h2 class="game-input__subtitle">從靈感到餐桌，只要一個步驟</h2>
+              <p class="game-input__desc">
+                冰箱有剩菜卻不知道能做什麼？讓 AI 幫你想！<br>
+                輸入食材，系統將為您推薦最適合的料理方案。
+              </p>
+              <div class="game-input__stats">
+                <div class="game-input__stat">
+                  <span class="game-input__stat-value">30,000+</span>
+                  <span class="game-input__stat-label">食譜資料庫</span>
+                </div>
+                <div class="game-input__stat">
+                  <span class="game-input__stat-value">AI</span>
+                  <span class="game-input__stat-label">智慧推薦</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 底部：手牌區 + 輸入框 -->
+          <div class="hand-area">
+            <!-- 輸入框 -->
+            <form class="ingredient-input" (submit)="handleAddIngredient($event)">
+              <input
+                type="text"
+                [value]="inputValue()"
+                (input)="inputValue.set($any($event.target).value)"
+                [disabled]="isProcessing()"
+                [placeholder]="isProcessing() ? '生成中...' : '輸入食材名稱（如：牛肉、洋蔥、咖哩塊）'"
+                class="ingredient-input__field"
+              >
+              <button
+                type="submit"
+                [disabled]="!inputValue() || isProcessing()"
+                class="ingredient-input__btn"
+              >
+                @if (isProcessing()) {
+                  <svg class="ingredient-input__spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                  <span>生成中</span>
+                } @else {
+                  <svg class="ingredient-input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                  <span>新增食材</span>
+                }
+              </button>
+            </form>
+
+            <!-- 手牌標題 -->
+            <div class="hand-area__header">
+              <span class="hand-area__title">
+                <svg class="hand-area__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                食材清單 ({{ hand().length }})
+              </span>
+              <span class="hand-area__hint">點擊食材加入鍋中</span>
+            </div>
+
+            <!-- 卡牌列表 -->
+            <div class="hand-cards">
+              @if (hand().length === 0 && !isProcessing()) {
+                <div class="hand-cards__empty">
+                  <svg class="hand-cards__empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  </svg>
+                  <p>輸入食材開始探索美味食譜...</p>
+                </div>
+              }
+
+              <!-- 生成中的卡牌 -->
+              @if (isProcessing()) {
+                <div class="card-materializing">
+                  <svg class="card-materializing__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                  <span class="card-materializing__text">分析中...</span>
+                </div>
+              }
+
+              <!-- 已生成的卡牌 -->
+              @for (card of hand(); track card.id) {
+                <div
+                  class="ingredient-card"
+                  [class.ingredient-card--selected]="isSelected(card)"
+                  (click)="toggleSelectCard(card)"
+                >
+                  <!-- 卡片頭部 -->
+                  <div class="ingredient-card__header">
+                    <span class="ingredient-card__name">{{ card.name }}</span>
+                    <span class="ingredient-card__element" [style.background]="getElementColor(card.element)">
+                      {{ card.element }}
+                    </span>
+                  </div>
+
+                  <!-- 卡圖 -->
+                  <div class="ingredient-card__image">
+                    @if (card.img && !hasImageError(card.id)) {
+                      <img [src]="card.img" [alt]="card.name" (error)="handleImageError(card.id)" loading="eager">
+                    } @else {
+                      <div class="ingredient-card__fallback" [style.background]="'linear-gradient(135deg, ' + getElementColor(card.element) + '33, ' + getElementColor(card.element) + '66)'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                      </div>
+                    }
+                    <!-- 選中標記 -->
+                    @if (isSelected(card)) {
+                      <div class="ingredient-card__check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- 卡片底部 -->
+                  <div class="ingredient-card__footer">
+                    <span class="ingredient-card__type">[{{ card.type }}]</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- FUSING 狀態（鍋子動畫） -->
+      @if (gameState() === 'FUSING') {
+        <div class="game-fusing">
+          <div class="cooking-animation">
+            <!-- 鍋子 -->
+            <div class="cooking-pot">
+              <!-- 鍋蓋 -->
+              <div class="cooking-pot__lid" [class.cooking-pot__lid--closed]="lidState() === 'closed'">
+                <svg viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="25" rx="45" ry="5" fill="#6B5344"/>
+                  <path d="M10 25 Q50 0 90 25" fill="#8B7355"/>
+                  <circle cx="50" cy="8" r="6" fill="#6B5344"/>
+                </svg>
+              </div>
+
+              <!-- 鍋身 -->
+              <svg class="cooking-pot__body" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="60" cy="70" rx="55" ry="8" fill="#8B7355"/>
+                <path d="M10 30 Q10 70 60 70 Q110 70 110 30 L110 30 Q110 40 60 45 Q10 40 10 30Z" fill="url(#potGradient2)"/>
+                <ellipse cx="60" cy="30" rx="50" ry="12" fill="#C45D4A"/>
+                <rect x="0" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
+                <rect x="105" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
+                <defs>
+                  <linearGradient id="potGradient2" x1="60" y1="30" x2="60" y2="70" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#C45D4A"/>
+                    <stop offset="100%" stop-color="#8B4513"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              <!-- 跳入的食材 -->
+              @for (card of selectedCards(); track card.id; let idx = $index) {
+                <div
+                  class="jumping-ingredient"
+                  [class.jumping-ingredient--jumped]="idx < jumpingIngredientIndex()"
+                  [style.animation-delay]="idx * 0.6 + 's'"
+                >
+                  <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="16" [attr.fill]="getElementColor(card.element)"/>
+                    <text x="20" y="25" text-anchor="middle" fill="white" font-size="14" font-weight="bold">{{ card.name.charAt(0) }}</text>
+                  </svg>
+                </div>
+              }
+
+              <!-- 蒸氣 -->
+              @if (showSteam()) {
+                <div class="steam-container">
+                  <div class="steam steam--1">
+                    <svg viewBox="0 0 20 30" fill="none">
+                      <path d="M10 30 Q5 20 10 15 Q15 10 10 0" stroke="#999" stroke-width="2" fill="none" opacity="0.6"/>
+                    </svg>
+                  </div>
+                  <div class="steam steam--2">
+                    <svg viewBox="0 0 20 30" fill="none">
+                      <path d="M10 30 Q15 20 10 15 Q5 10 10 0" stroke="#999" stroke-width="2" fill="none" opacity="0.6"/>
+                    </svg>
+                  </div>
+                  <div class="steam steam--3">
+                    <svg viewBox="0 0 20 30" fill="none">
+                      <path d="M10 30 Q5 20 10 15 Q15 10 10 0" stroke="#999" stroke-width="2" fill="none" opacity="0.6"/>
+                    </svg>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <h2 class="cooking-animation__title">
+              @if (cookingPhase() === 'jumping') {
+                食材準備中...
+              } @else if (cookingPhase() === 'cooking') {
+                AI 正在分析食譜...
+              } @else {
+                即將完成！
+              }
+            </h2>
+            <p class="cooking-animation__subtitle">請稍候，美味即將呈現</p>
+          </div>
+        </div>
+      }
+
+      <!-- RESULT 狀態 -->
+      @if (gameState() === 'RESULT') {
+        <div class="game-result">
+          <div class="game-result__header">
+            <svg class="game-result__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <h2 class="game-result__title">食譜推薦完成！</h2>
+            <p class="game-result__subtitle">AI 根據您的食材，為您推薦以下食譜</p>
+          </div>
+
+          <!-- 食譜卡片列表 -->
+          <div class="recipe-cards">
+            @for (recipe of recipeResults(); track recipe.id) {
+              <div class="recipe-card-game" (click)="selectRecipe(recipe)">
+                <!-- 星級 -->
+                <div class="recipe-card-game__stars">
+                  @for (star of [].constructor(recipe.stars); track $index) {
+                    <svg class="recipe-card-game__star" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  }
+                </div>
+
+                <!-- 卡圖 -->
+                <div class="recipe-card-game__image">
+                  <img [src]="recipe.img" [alt]="recipe.name">
+                  <div class="recipe-card-game__overlay"></div>
+                </div>
+
+                <!-- 卡片資訊 -->
+                <div class="recipe-card-game__info">
+                  <h3 class="recipe-card-game__name">{{ recipe.name }}</h3>
+                  <p class="recipe-card-game__desc">{{ recipe.desc }}</p>
+                  <div class="recipe-card-game__tags">
+                    @for (tag of recipe.tags; track tag) {
+                      <span class="recipe-card-game__tag">#{{ tag }}</span>
+                    }
+                  </div>
+                  <div class="recipe-card-game__meta">
+                    <span class="recipe-card-game__time">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      {{ recipe.cookingTime }} 分鐘
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 缺少食材提示 -->
+                @if (recipe.missingIngredients.length > 0) {
+                  <div class="recipe-card-game__missing">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>缺少：</span>
+                    @for (mi of recipe.missingIngredients; track mi.name) {
+                      <a [href]="mi.purchaseUrl" target="_blank" class="missing-ingredient">
+                        {{ mi.name }}
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- 操作按鈕 -->
+          <div class="game-result__actions">
+            <button type="button" class="btn-game btn-game--secondary" (click)="resetGame()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/>
+                <path d="M3 3v9h9"/>
+              </svg>
+              重新選擇食材
+            </button>
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- 食譜詳情彈窗 -->
+  @if (selectedRecipe()) {
+    <div class="recipe-modal" (click)="closeRecipeDetail()">
+      <div class="recipe-modal__content" (click)="$event.stopPropagation()">
+        <button type="button" class="recipe-modal__close" (click)="closeRecipeDetail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <div class="recipe-modal__header">
+          <img [src]="selectedRecipe()!.img" [alt]="selectedRecipe()!.name" class="recipe-modal__image">
+          <div class="recipe-modal__overlay"></div>
+          <div class="recipe-modal__title-wrap">
+            <div class="recipe-modal__stars">
+              @for (star of [].constructor(selectedRecipe()!.stars); track $index) {
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              }
+            </div>
+            <h2 class="recipe-modal__title">{{ selectedRecipe()!.name }}</h2>
+          </div>
+        </div>
+
+        <div class="recipe-modal__body">
+          <p class="recipe-modal__desc">{{ selectedRecipe()!.desc }}</p>
+
+          <div class="recipe-modal__meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              {{ selectedRecipe()!.cookingTime }} 分鐘
+            </span>
+          </div>
+
+          <!-- 缺少食材 -->
+          @if (selectedRecipe()!.missingIngredients.length > 0) {
+            <div class="recipe-modal__missing">
+              <h4>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                缺少食材
+              </h4>
+              <div class="missing-cards">
+                @for (mi of selectedRecipe()!.missingIngredients; track mi.name) {
+                  <div class="missing-card">
+                    <svg class="missing-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span class="missing-card__name">{{ mi.name }}</span>
+                    <a [href]="mi.purchaseUrl" target="_blank" class="missing-card__buy">前往購買</a>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- 烹調步驟 -->
+          <div class="recipe-modal__steps">
+            <h4>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              烹調步驟
+            </h4>
+            <ol class="steps-list">
+              @for (step of selectedRecipe()!.steps; track $index; let i = $index) {
+                <li class="steps-list__item">
+                  <span class="steps-list__number">{{ i + 1 }}</span>
+                  <span class="steps-list__text">{{ step }}</span>
+                </li>
+              }
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Recommended Recipes -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">推薦熱門食譜</h2>
+      <div class="recipe-grid">
+        @for (recipe of recipes(); track recipe.id) {
+          <app-recipe-card
+            [id]="recipe.id"
+            [title]="recipe.title"
+            [imageUrl]="recipe.imageUrl"
+            [cookingTime]="recipe.cookingTime"
+            [rating]="recipe.rating"
+          />
+        }
+      </div>
+      <div class="section-action">
+        <a routerLink="/recipes" class="btn btn--outline">
+          查詢看更多的食譜？點一下！
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recipe Categories -->
+  <section class="section section--gray">
+    <div class="container">
+      <h2 class="section-title">推薦食譜主題</h2>
+      <div class="category-grid">
+        @for (category of categories(); track category.id) {
+          <app-category-card
+            [id]="category.id"
+            [title]="category.title"
+            [imageUrl]="category.imageUrl"
+            [description]="category.description"
+          />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <app-cta-section />
+</div>

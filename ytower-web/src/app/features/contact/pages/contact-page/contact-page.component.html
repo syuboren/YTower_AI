@@ -1,0 +1,162 @@
+<div class="contact-page">
+  <div class="container">
+    <app-breadcrumb [items]="breadcrumbItems" />
+
+    <header class="page-header">
+      <h1 class="page-header__title">聯絡我們｜<span>Contact Us</span></h1>
+      <p class="page-header__subtitle">有任何問題、合作、或想聊聊料理的事，歡迎隨時聯絡我們</p>
+    </header>
+
+    <div class="page-intro">
+      <p>有時候，一道料理的靈感，來自一次對話。</p>
+      <p>
+        如果你在使用網站的過程中有任何建議，或想與我們合作拍攝、品牌聯名、內容授權，都非常歡迎與我們聯繫。
+        楊桃美食網始終相信，好的料理與好的人，會在對的時刻相遇！
+      </p>
+    </div>
+
+    <div class="contact-layout">
+      <!-- Company Info -->
+      <div class="company-info">
+        <h2 class="company-info__title">{{ companyInfo.name }}</h2>
+        <dl class="info-list">
+          <div class="info-item">
+            <dt>公司名稱</dt>
+            <dd>{{ companyInfo.company }}</dd>
+          </div>
+          <div class="info-item">
+            <dt>服務時間</dt>
+            <dd>{{ companyInfo.serviceHours }}</dd>
+          </div>
+          <div class="info-item">
+            <dt>客服 Line</dt>
+            <dd>{{ companyInfo.line }}</dd>
+          </div>
+          <div class="info-item">
+            <dt>聯絡電話</dt>
+            <dd>{{ companyInfo.phone }}</dd>
+          </div>
+          <div class="info-item">
+            <dt>客服信箱</dt>
+            <dd>{{ companyInfo.email }}</dd>
+          </div>
+          <div class="info-item">
+            <dt>媒體與品牌合作</dt>
+            <dd>{{ companyInfo.mediaEmail }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="contact-form-wrapper">
+        <div class="contact-form-card">
+          <h2 class="form-title">聯絡我們｜CONTACT US</h2>
+
+          @if (isSubmitted()) {
+            <div class="success-message">
+              <div class="success-icon">✓</div>
+              <h3>感謝您的來信！</h3>
+              <p>我們已收到您的訊息，將會盡快回覆您。</p>
+            </div>
+          } @else {
+            <form (ngSubmit)="onSubmit()" #contactForm="ngForm">
+              <div class="form-row">
+                <div class="form-group form-group--name">
+                  <label for="name" class="form-label">姓名*</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    name="name"
+                    class="form-input"
+                    [value]="formData().name"
+                    (input)="updateField('name', $any($event.target).value)"
+                    required
+                  >
+                </div>
+                <div class="form-group form-group--gender">
+                  <label class="form-label">稱謂</label>
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input 
+                        type="radio" 
+                        name="gender" 
+                        value="male"
+                        [checked]="formData().gender === 'male'"
+                        (change)="updateField('gender', 'male')"
+                      >
+                      <span>先生</span>
+                    </label>
+                    <label class="radio-label">
+                      <input 
+                        type="radio" 
+                        name="gender" 
+                        value="female"
+                        [checked]="formData().gender === 'female'"
+                        (change)="updateField('gender', 'female')"
+                      >
+                      <span>小姐</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="company" class="form-label">公司行號</label>
+                <input 
+                  type="text" 
+                  id="company" 
+                  name="company"
+                  class="form-input"
+                  [value]="formData().company"
+                  (input)="updateField('company', $any($event.target).value)"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="form-label">E-Mail*</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email"
+                  class="form-input"
+                  [value]="formData().email"
+                  (input)="updateField('email', $any($event.target).value)"
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="message" class="form-label">詢問內容...</label>
+                <textarea 
+                  id="message" 
+                  name="message"
+                  class="form-textarea"
+                  rows="5"
+                  [value]="formData().message"
+                  (input)="updateField('message', $any($event.target).value)"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button 
+                  type="submit" 
+                  class="submit-btn"
+                  [disabled]="isSubmitting() || !contactForm.valid"
+                >
+                  @if (isSubmitting()) {
+                    <span class="loading-spinner"></span>
+                    送出中...
+                  } @else {
+                    送出訊息
+                  }
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

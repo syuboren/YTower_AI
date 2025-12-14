@@ -1,0 +1,1296 @@
+.ai-assistant-page {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+}
+
+// ============================================
+// AI Hero Section（淺色模式）
+// ============================================
+.ai-hero {
+  position: relative;
+  min-height: 600px;
+  padding: 2rem 0 4rem;
+  overflow: hidden;
+  background: #fff;
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  &__bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #FDF8F3 0%, #fff 100%);
+  }
+
+  &__bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+
+    &--1 {
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(245, 130, 32, 0.15) 0%, transparent 70%);
+    }
+
+    &--2 {
+      bottom: -150px;
+      left: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(196, 93, 74, 0.1) 0%, transparent 70%);
+    }
+  }
+}
+
+// ============================================
+// Game Input State（淺色模式）
+// ============================================
+.game-input {
+  position: relative;
+  z-index: 1;
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    @media (min-width: 992px) {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  &__info {
+    text-align: center;
+
+    @media (min-width: 992px) {
+      text-align: left;
+      order: -1;
+    }
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+
+    @media (min-width: 768px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  &__subtitle {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #C45D4A;
+    margin-bottom: 1.5rem;
+  }
+
+  &__desc {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  &__stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+
+    @media (min-width: 992px) {
+      justify-content: flex-start;
+    }
+  }
+
+  &__stat {
+    text-align: center;
+
+    @media (min-width: 992px) {
+      text-align: left;
+    }
+  }
+
+  &__stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #F58220;
+  }
+
+  &__stat-label {
+    font-size: 0.875rem;
+    color: #999;
+  }
+}
+
+// ============================================
+// Cooking Zone（鍋子區域）
+// ============================================
+.cooking-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.pot-container {
+  position: relative;
+  width: 280px;
+  height: 250px;
+
+  @media (min-width: 768px) {
+    width: 320px;
+    height: 280px;
+  }
+}
+
+.pot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__svg {
+    width: 200px;
+    height: auto;
+
+    @media (min-width: 768px) {
+      width: 240px;
+    }
+  }
+}
+
+.ingredient-icon {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: float 3s ease-in-out infinite;
+
+  &__svg {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  }
+
+  &__name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+    background: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.pot-action {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pot-hint {
+  text-align: center;
+
+  &__text {
+    font-size: 0.875rem;
+    color: #999;
+    margin-bottom: 0.5rem;
+  }
+
+  &__dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    transition: all 0.3s;
+
+    &--active {
+      background: #F58220;
+      box-shadow: 0 0 8px rgba(245, 130, 32, 0.4);
+    }
+  }
+}
+
+.cook-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(245, 130, 32, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245, 130, 32, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &__icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  &__text {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+// ============================================
+// Hand Area（手牌區 - 淺色模式）
+// ============================================
+.hand-area {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+    color: #C45D4A;
+  }
+
+  &__hint {
+    color: #999;
+    font-size: 0.8125rem;
+  }
+}
+
+// ============================================
+// Ingredient Input（淺色模式）
+// ============================================
+.ingredient-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  &__field {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    background: #f9f9f9;
+    border: 2px solid #e5e5e5;
+    border-radius: 30px;
+    color: #333;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s;
+
+    &::placeholder {
+      color: #aaa;
+    }
+
+    &:focus {
+      border-color: #F58220;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(245, 130, 32, 0.1);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(245, 130, 32, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  &__spinner {
+    width: 18px;
+    height: 18px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+// ============================================
+// Hand Cards（淺色模式）
+// ============================================
+.hand-cards {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0 1rem;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  &__empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+    padding: 3rem;
+    color: #aaa;
+    border: 2px dashed #e5e5e5;
+    border-radius: 12px;
+  }
+
+  &__empty-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+  }
+}
+
+// ============================================
+// Card Materializing（生成動畫 - 淺色）
+// ============================================
+.card-materializing {
+  flex-shrink: 0;
+  width: 140px;
+  height: 180px;
+  background: #f9f9f9;
+  border: 2px solid #F58220;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    color: #F58220;
+    animation: spin 1s linear infinite;
+  }
+
+  &__text {
+    font-size: 0.875rem;
+    color: #F58220;
+    font-weight: 600;
+  }
+}
+
+// ============================================
+// Ingredient Card（淺色模式）
+// ============================================
+.ingredient-card {
+  flex-shrink: 0;
+  width: 140px;
+  background: #fff;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #ccc;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  &--selected {
+    border-color: #F58220;
+    box-shadow: 0 4px 20px rgba(245, 130, 32, 0.2);
+
+    &:hover {
+      border-color: #F58220;
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  &__name {
+    color: #333;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+  }
+
+  &__element {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  &__image {
+    position: relative;
+    height: 90px;
+    background: #f5f5f5;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  &__fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 32px;
+      height: 32px;
+      opacity: 0.5;
+    }
+  }
+
+  &__check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: #F58220;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: #fff;
+    }
+  }
+
+  &__footer {
+    padding: 0.5rem 0.75rem;
+    background: #f9f9f9;
+    border-top: 1px solid #e5e5e5;
+  }
+
+  &__type {
+    font-size: 0.75rem;
+    color: #999;
+  }
+}
+
+// ============================================
+// Game Fusing（烹飪動畫 - 淺色模式）
+// ============================================
+.game-fusing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: 2rem;
+}
+
+.cooking-animation {
+  text-align: center;
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-top: 2rem;
+  }
+
+  &__subtitle {
+    color: #999;
+    margin-top: 0.5rem;
+  }
+}
+
+.cooking-pot {
+  position: relative;
+  width: 200px;
+  height: 160px;
+  margin: 0 auto;
+
+  &__lid {
+    position: absolute;
+    top: -10px;
+      left: 50%;
+    transform: translateX(-50%) translateY(-20px) rotate(-15deg);
+    width: 160px;
+    transition: all 0.5s ease-out;
+    z-index: 10;
+
+    &--closed {
+      transform: translateX(-50%) translateY(0) rotate(0);
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  &__body {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: auto;
+  }
+}
+
+.jumping-ingredient {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 1;
+  animation: jumpIntoPot 0.6s ease-in forwards;
+  animation-play-state: paused;
+
+  &--jumped {
+    animation-play-state: running;
+  }
+
+  svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@keyframes jumpIntoPot {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  30% {
+    transform: translateX(-50%) translateY(-30px) scale(1.2);
+  }
+  100% {
+    transform: translateX(-50%) translateY(60px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+// 蒸氣動畫
+.steam-container {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+}
+
+.steam {
+  animation: steamRise 2s ease-out infinite;
+
+  &--1 { animation-delay: 0s; }
+  &--2 { animation-delay: 0.3s; }
+  &--3 { animation-delay: 0.6s; }
+
+  svg {
+    width: 20px;
+    height: 30px;
+  }
+}
+
+@keyframes steamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.2);
+  }
+}
+
+// ============================================
+// Game Result（結果 - 淺色模式）
+// ============================================
+.game-result {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 0;
+  min-height: 400px;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    color: #22c55e;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    color: #666;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+}
+
+// ============================================
+// Recipe Cards（食譜卡 - 淺色模式）
+// ============================================
+.recipe-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recipe-card-game {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  overflow: visible;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    border-color: #F58220;
+  }
+
+  &__stars {
+    display: flex;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 0.5rem 0.75rem;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 16px 16px 0 0;
+  }
+
+  &__star {
+    width: 16px;
+    height: 16px;
+    color: #F58220;
+  }
+
+  &__image {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+  }
+
+  &__info {
+    padding: 1rem;
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__tag {
+    font-size: 0.75rem;
+    color: #F58220;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #999;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__missing {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #FEF3E6;
+    border-top: 1px solid #FDE7CC;
+    font-size: 0.8125rem;
+    color: #d97706;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.missing-ingredient {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #d97706;
+  background: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid #FDE7CC;
+  text-decoration: none;
+  transition: all 0.3s;
+
+  &:hover {
+    background: #F58220;
+    color: #fff;
+    border-color: #F58220;
+  }
+}
+
+// ============================================
+// Buttons（淺色模式）
+// ============================================
+.btn-game {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &--primary {
+    background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+    color: #fff;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(245, 130, 32, 0.3);
+    }
+  }
+
+  &--secondary {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #e5e5e5;
+
+    &:hover {
+      background: #eee;
+    }
+  }
+}
+
+// ============================================
+// Recipe Modal（淺色模式）
+// ============================================
+.recipe-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+
+  &__content {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+
+  &__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: #333;
+    }
+
+    &:hover {
+      background: #C45D4A;
+
+      svg {
+        color: #fff;
+      }
+    }
+  }
+
+  &__header {
+    position: relative;
+    height: 200px;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  }
+
+  &__title-wrap {
+    position: absolute;
+    bottom: 1rem;
+    left: 1.5rem;
+  }
+
+  &__stars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 0.5rem;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      color: #F58220;
+    }
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  &__body {
+    padding: 1.5rem;
+  }
+
+  &__desc {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    color: #999;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__missing {
+    background: #FEF3E6;
+    border: 1px solid #FDE7CC;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #d97706;
+      font-size: 0.9375rem;
+      margin-bottom: 0.75rem;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  &__steps {
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #333;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        color: #C45D4A;
+      }
+    }
+  }
+}
+
+// Missing Cards（灰階未裝備卡片）
+.missing-cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.missing-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  min-width: 100px;
+  filter: grayscale(0.5);
+  transition: all 0.3s;
+
+  &:hover {
+    filter: grayscale(0);
+    border-color: #F58220;
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    color: #999;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  &__buy {
+    font-size: 0.75rem;
+    color: #F58220;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Steps List
+.steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__number {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  &__text {
+    color: #333;
+    line-height: 1.6;
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+// ============================================
+// Existing Sections（保留原有樣式）
+// ============================================
+.section {
+  padding: 4rem 0;
+
+  &--gray {
+    background: #f9f9f9;
+  }
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin: 0 0 2.5rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #C45D4A, #F58220);
+    margin: 0.75rem auto 0;
+  }
+}
+
+.section-action {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.875rem 2rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &--outline {
+    background: transparent;
+    color: #C45D4A;
+    border: 2px solid #C45D4A;
+
+    &:hover {
+      background: #C45D4A;
+      color: #fff;
+    }
+  }
+}

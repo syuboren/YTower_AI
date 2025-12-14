@@ -1,0 +1,37 @@
+<a [routerLink]="['/recipes', id()]" class="recipe-card">
+  <div class="recipe-card__image-wrapper">
+    <img [src]="imageUrl()" [alt]="title()" class="recipe-card__image" loading="lazy">
+    <div class="recipe-card__overlay">
+      <span class="recipe-card__view-btn">查看食譜</span>
+    </div>
+  </div>
+  
+  <div class="recipe-card__content">
+    <h3 class="recipe-card__title">{{ title() }}</h3>
+    
+    <div class="recipe-card__meta">
+      <span class="recipe-card__time">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        烹調時間：{{ cookingTime() }} 分鐘
+      </span>
+    </div>
+    
+    @if (showRating()) {
+      <div class="recipe-card__rating">
+        @for (star of filledStars; track $index) {
+          <span class="star star--filled">★</span>
+        }
+        @if (hasHalfStar) {
+          <span class="star star--half">★</span>
+        }
+        @for (star of emptyStars; track $index) {
+          <span class="star star--empty">☆</span>
+        }
+      </div>
+    }
+  </div>
+</a>
+

@@ -1,0 +1,52 @@
+<footer class="footer">
+  <div class="footer__main">
+    <div class="footer__brand">
+      <a routerLink="/" class="footer__logo">
+        <img src="assets/images/logo.png" alt="楊桃美食網" class="footer__logo-img">
+      </a>
+      <h3 class="footer__brand-name">楊桃美食網｜YTower</h3>
+      <div class="footer__company-info">
+        <p>{{ companyInfo.name }}｜統編{{ companyInfo.taxId }}</p>
+        <p>客服 Line：{{ companyInfo.lineId }}（一定要加&#64;喔！）</p>
+        <p>聯絡電話：{{ companyInfo.phone }}</p>
+      </div>
+    </div>
+
+    <div class="footer__links">
+      <div class="footer__section">
+        <h4>關於我們</h4>
+        <ul>
+          <li><a routerLink="/ai-assistant">AI 食譜</a></li>
+          <li><a routerLink="/contact">聯絡我們</a></li>
+        </ul>
+      </div>
+      <div class="footer__section">
+        <h4>食譜專區</h4>
+        <ul>
+          <li><a routerLink="/recipes/category/healthy">健康飲食</a></li>
+          <li><a routerLink="/recipes/category/quick">快速料理</a></li>
+          <li><a routerLink="/recipes/category/festive">節慶主題</a></li>
+        </ul>
+      </div>
+      <div class="footer__section">
+        <h4>最新消息</h4>
+        <ul>
+          <li><a routerLink="/news">服務更新</a></li>
+          <li><a routerLink="/news">活動企劃</a></li>
+        </ul>
+      </div>
+      <div class="footer__section">
+        <h4>友站連結</h4>
+        <ul>
+          <li><a href="https://shop.ytower.com.tw" target="_blank">楊桃購物網</a></li>
+          <li><a href="https://www.facebook.com/ytower" target="_blank">臉書粉絲專頁</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer__copyright">
+    <p>COPYRIGHT© {{ currentYear }} 楊桃文化事業有限公司 ALL RIGHTS RESERVED.</p>
+  </div>
+</footer>
+

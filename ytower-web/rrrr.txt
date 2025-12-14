@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全陞模具 設備智慧化成熟度儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Professional Blue & Tech Teal -->
+    <!-- Application Structure Plan: 採用雙視圖SPA架構。第一視圖為「總覽儀表板」，透過宏觀圖表與關鍵指標，快速呈現整體設備的成熟度分佈與比較，讓管理者能迅速掌握概況。第二視圖為「設備詳細資料」，當使用者從儀表板點擊特定設備後進入，提供該設備的深入規格、評估細節與智慧化整合方案。此結構將「宏觀比較」與「微觀深入」分離，引導使用者由淺入深地探索資訊，避免資訊過載，提升了報告內容的可讀性與易用性。 -->
+    <!-- Visualization & Content Choices: 
+        1. 設備成熟度分佈 -> Goal: Inform -> Viz: 環圈圖 (Chart.js) -> Interaction: Hover -> Justification: 直觀呈現各等級設備數量佔比，快速了解整體成熟度結構。
+        2. 各設備五大構面評分 -> Goal: Compare -> Viz: 雷達圖 (Chart.js) -> Interaction: Click legend to highlight -> Justification: 非常適合比較多個項目在多個維度上的表現，能立即凸顯各設備的強弱項與特性差異。
+        3. 單一設備評分 -> Goal: Analyze -> Viz: 水平長條圖 (Chart.js) -> Interaction: Hover -> Justification: 清晰展示單一設備在各構面的具體分數，便於深入分析。
+        4. 設備列表 -> Goal: Organize/Navigate -> Viz: HTML互動列表 -> Interaction: Filter/Sort/Click -> Justification: 提供傳統的文字索引方式，方便使用者快速查找特定設備。
+        5. 技術規劃 -> Goal: Inform -> Viz: HTML結構化文字與代碼區塊 -> Interaction: None -> Justification: 清晰呈現技術性文字與程式碼範例。
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc; /* Light gray background */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            max-height: 450px;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #1E3A8A; /* Dark Blue */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .nav-button:not(.active):hover {
+            background-color: #DBEAFE; /* Light Blue on hover */
+        }
+        .equipment-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .equipment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .tag-lv1 { background-color: #FEF3C7; color: #92400E; } /* Amber */
+        .tag-lv2 { background-color: #D1FAE5; color: #065F46; } /* Green */
+        .tag-lv3 { background-color: #DBEAFE; color: #1E40AF; } /* Blue */
+        .tag-lv4 { background-color: #FCE7F3; color: #9D266B; } /* Pink */
+        .tag-prod { background-color: #E0E7FF; color: #3730A3; } /* Indigo */
+        .tag-insp { background-color: #F3E8FF; color: #581C87; } /* Purple */
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+        
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">全陞模具工業</h1>
+            <p class="text-lg md:text-xl text-gray-600 mt-2">生產設備智慧化成熟度互動報告</p>
+        </header>
+
+        <main id="dashboard-view">
+            <section id="intro" class="mb-8 p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">報告總覽</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    本互動報告旨在將《生產設備盤點報告》的內容，透過可視化與互動的方式呈現。您可以透過下方的圖表與列表，快速了解現有七台核心設備的智慧化成熟度概況。點擊雷達圖中的圖例或設備列表中的項目，即可深入探索單一設備的詳細規格、成熟度評分解析，以及未來的智慧化整合規劃建議。
+                </p>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-1 p-6 bg-white rounded-lg shadow-md flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4 text-center text-gray-900">成熟度等級分佈</h3>
+                    <div class="chart-container mx-auto" style="max-height: 300px;">
+                        <canvas id="maturityDonutChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 p-6 bg-white rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-4 text-center text-gray-900">五大構面能力雷達圖</h3>
+                    <div class="chart-container">
+                        <canvas id="maturityRadarChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="equipment-list-section" class="p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">設備清單</h2>
+                <div id="filter-buttons" class="flex flex-wrap gap-2 mb-4">
+                    <button data-filter="all" class="nav-button active px-4 py-2 bg-gray-200 text-gray-800 rounded-md">全部 (7)</button>
+                    <button data-filter="production" class="nav-button px-4 py-2 bg-gray-200 text-gray-800 rounded-md">生產設備 (2)</button>
+                    <button data-filter="inspection" class="nav-button px-4 py-2 bg-gray-200 text-gray-800 rounded-md">檢驗設備 (5)</button>
+                </div>
+                <div id="equipment-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </section>
+        </main>
+
+        <main id="detail-view" class="hidden">
+            <button id="back-to-dashboard" class="mb-6 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors">
+                &larr; 返回總覽
+            </button>
+            <div id="detail-content" class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        const equipmentData = [
+            {
+                id: 'P-01',
+                name: 'CNC放電機',
+                brand: '億曜企業',
+                model: 'S430A',
+                type: 'production',
+                description: '主要用於模具的精密成形加工，特別是傳統切削工具難以加工的堅硬材料(如淬火鋼、鎢鋼)或複雜的內腔、深孔、窄縫等。本機台採用ZNC控制系統，能進行Z軸的自動伺服進給與定位，適合標準化的放電加工。其穩定的放電迴路與高剛性結構，是確保模具尺寸精度與表面品質的關鍵。',
+                maturity: { level: 2, scores: [3, 2, 2, 2, 0], rationale: '此設備具備資料輸出的潛力，透過加裝硬體與中介軟體後，可實現數據的自動化傳輸與儲存，符合「資料連線」等級的定義，為後續系統整合打下良好基礎。' },
+                integration: {
+                    networking: '有線網路 (Ethernet)。可規劃透過在機台旁加裝「數據採集器 (Gateway)」或「物聯網閘道器」，將機台的RS-232訊號轉換為TCP/IP網路訊號。',
+                    interfacing: '硬體：可考慮使用RS-232轉TCP/IP數據採集器。軟體：規劃由數據採集器讀取機台狀態與加工參數後，透過MQTT通訊協定發布至公司內部伺服器。',
+                    dataFlow: '1. 採集：規劃由數據採集器即時監控機台RS-232端口的數據。 2. 傳輸：將解析後的數據透過有線網路，以MQTT格式發送至數據中台。 3. 儲存：數據中台將接收到的資訊存入後端資料庫。 4. 應用：最終應用於可視化戰情中心、MES系統。',
+                    dataFormat: `{ "deviceId": "EDM-P01", "timestamp": "...", "status": "processing", ... }`
+                }
+            },
+            {
+                id: 'P-02',
+                name: '雷射刻字機',
+                brand: '皓茂興業',
+                model: '客製化機型',
+                type: 'production',
+                description: '用於出貨前，在模具或工件本體上進行永久性的標記，如產品型號、批號、二維碼(QR Code)、公司Logo等，以利後續追溯與品牌識別。本機台採用光纖雷射源，具有速度快、精度高、無耗材的優點。',
+                maturity: { level: 3, scores: [4, 4, 4, 3, 2], rationale: '此設備的控制軟體具備被外部系統呼叫的潛力。規劃中可由ERP系統自動拋轉結構化的任務檔，實現由上層系統驅動設備執行的目的。此階段已達到系統間的初步整合與連動，故評定為Lv. 3。' },
+                integration: {
+                    networking: '有線網路 (Ethernet)。可規劃將控制該機台的電腦直接連入公司內部網路。',
+                    interfacing: '軟體API整合規劃。可規劃透過開發程式，使ERP/MES系統能直接呼叫雷射機控制軟體的API，或將含有雕刻資訊的任務檔自動傳送至指定的網路共享資料夾。',
+                    dataFlow: '1. 觸發：規劃由ERP系統中工單狀態轉為「待刻字」時觸發。 2. 生成：ERP系統自動生成任務檔。 3. 傳輸：任務檔透過API或共享資料夾方式傳送。 4. 執行與回饋：雷射機執行後，透過API或狀態檔回傳訊號。',
+                    dataFormat: `{ "jobId": "WO-...", "type": "qrcode", "data": "http://...", ... }`
+                }
+            },
+            {
+                id: 'I-01',
+                name: '2.5D投影機',
+                brand: '台智精密',
+                model: 'VMS-2515F',
+                type: 'inspection',
+                description: '用於模具關鍵尺寸的二維量測，如外型輪廓、孔徑、孔距、導角、R角等。本機為手動影像量測儀，透過高解析CCD鏡頭擷取影像，搭配專業量測軟體，可進行自動尋邊、多點擬合等功能，大幅提升量測精度與效率。',
+                maturity: { level: 2, scores: [3, 3, 4, 2, 0], rationale: '設備本身具備USB/RS-232資料輸出介面，可將量測數據傳輸至專用電腦，並能產出CSV/Excel等結構化報告。此階段實現了檢驗報告的數位化與自動歸檔，免除人工抄寫，故評定為Lv. 2。' },
+                integration: {
+                    networking: 'USB或RS-232。建議將設備直接連接至一台專用的品檢站電腦。',
+                    interfacing: '軟體監聽或中介程式。可規劃開發一個中介程式，用以監聽從USB/RS-232端口傳來的數據，或直接讀取其量測軟體產出的報告檔。',
+                    dataFlow: '1. 量測 -> 2. 輸出報告檔 -> 3. 中介程式擷取 -> 4. 寫入QA/QC資料庫。',
+                    dataFormat: `{ "itemId": "...", "specName": "外徑", "measuredValue": 10.01, "result": "OK" }`
+                }
+            },
+            {
+                id: 'I-02',
+                name: '2.5D投影機',
+                brand: 'Sky',
+                model: 'SKY-2010G',
+                type: 'inspection',
+                description: '同樣用於二維尺寸的量測，作為快速檢驗或複檢的工具。本機台配備高精度光學尺與多功能數位顯示器(DRO)，操作直觀，可快速進行點、線、圓、角度等基本幾何元素的量測。',
+                maturity: { level: 1, scores: [3, 1, 1, 1, 0], rationale: '此設備的數位顯示器(DRO)具備RS-232資料輸出功能，但需要手動觸發才能將單筆數據傳送出去。數據傳輸並非全時自動，屬於被動連線模式，故評定為Lv. 1。' },
+                integration: {
+                    networking: 'RS-232。建議將設備數據處理器連接至一台專用的品檢站電腦。',
+                    interfacing: '軟體監聽或中介程式。可規劃開發一個中介程式，用以監聽從RS-232端口傳來的數據流。',
+                    dataFlow: '1. 量測 -> 2. 端口輸出 -> 3. 中介程式擷取 -> 4. 寫入QA/QC資料庫。',
+                    dataFormat: `{ "itemId": "...", "specName": "導角", "measuredValue": 0.98, "result": "OK" }`
+                }
+            },
+            {
+                id: 'I-03',
+                name: '輪廓形狀測定儀',
+                brand: 'Mitutoyo',
+                model: 'FTA-C3000',
+                type: 'inspection',
+                description: '針對模具進行高精度的輪廓形狀與表面粗度分析，如微小圓弧、角度、溝槽深度等。本機為高階接觸式量測儀，透過高靈敏度的測針沿工件表面掃描，能重建出微米等級的2D輪廓。',
+                maturity: { level: 3, scores: [5, 4, 5, 3, 2], rationale: '本設備可將量測報告透過網路自動歸檔至指定伺服器。透過後端程式自動解析檔案，即可將數據匯入QA/QC系統，並產出初步分析報表，已具備系統整合與初步智能應用雛形，故評定為Lv. 3。' },
+                integration: {
+                    networking: '有線網路 (Ethernet)。建議將控制電腦連入公司內部網路。',
+                    interfacing: '檔案自動匯出。可規劃在FORMTRACEPAK軟體中設定量測樣板，將結果自動以CSV或自訂格式匯出至指定的網路共享資料夾。',
+                    dataFlow: '1. 自動量測 -> 2. 自動匯出檔案 -> 3. 伺服器腳本解析 -> 4. 寫入資料庫與歸檔。',
+                    dataFormat: `CSV: "Angle_1", 29.8, "deg", "OK"`
+                }
+            },
+            {
+                id: 'I-04',
+                name: '輪廓形狀測定儀',
+                brand: 'Mitutoyo',
+                model: 'FTA-S4C3000',
+                type: 'inspection',
+                description: '為C3000系列之高階或特殊規格型號，可能具備更大的量測範圍、更高的精度或自動測針更換等功能，能進一步縮短檢測時間，並應對更複雜的量測任務，是研發與高階品保的核心設備。',
+                maturity: { level: 3, scores: [5, 4, 5, 3, 2], rationale: '與FTA-C3000能力相同，具備高度的數據取得、連網通訊、結構化與系統整合潛力。可實現檢測數據的自動化流程，並與SPC等品質系統串接，故評定為Lv. 3。' },
+                integration: {
+                    networking: '有線網路 (Ethernet)。建議將控制電腦連入公司內部網路。',
+                    interfacing: '檔案自動匯出。與FTA-C3000相同，可利用FORMTRACEPAK軟體功能，將結果自動匯出。',
+                    dataFlow: '1. 自動量測 -> 2. 自動匯出檔案 -> 3. 伺服器腳本解析 -> 4. 寫入資料庫與歸檔。',
+                    dataFormat: `CSV: "Radius_1", 0.502, "mm", "OK"`
+                }
+            },
+            {
+                id: 'I-05',
+                name: 'CNC三次元測定機',
+                brand: 'Mitutoyo',
+                model: 'CRYSTA-Apex EX',
+                type: 'inspection',
+                description: '對模具進行最終的全尺寸、全方位幾何公差檢測。本機為高性能CNC三次元量床，透過自動更換測頭與預設程式，可實現無人化全自動量測，並將量測結果與原始CAD設計圖進行比對。',
+                maturity: { level: 4, scores: [5, 5, 5, 4, 4], rationale: '本設備可透過其原生軟體與網路功能，將結構化數據直接與SPC品質系統深度整合。系統可依據預設規則，對量測數據進行即時的SPC統計分析，自動判斷製程能力與趨勢，並在異常發生時主動發出警報。此階段已具備數據分析與預警能力，故評定為Lv. 4。' },
+                integration: {
+                    networking: '有線網路 (Ethernet)。建議將控制電腦連入公司內部網路。',
+                    interfacing: '軟體原生整合功能。可利用MCOSMOS軟體內建的數據匯出功能(如匯出至MeasurLink SPC軟體)或DDE/OPC通訊功能，實現與外部系統的即時數據交換。',
+                    dataFlow: '1. 自動量測 -> 2. 即時傳輸 -> 3. SPC軟體接收 -> 4. 即時分析與警報。',
+                    dataFormat: `直接寫入資料庫 或 CSV`
+                }
+            }
+        ];
+
+        const maturityLevels = {
+            1: { label: 'Lv.1 被動連線', class: 'tag-lv1' },
+            2: { label: 'Lv.2 資料連線', class: 'tag-lv2' },
+            3: { label: 'Lv.3 系統整合', class: 'tag-lv3' },
+            4: { label: 'Lv.4 智能判斷', class: 'tag-lv4' },
+        };
+
+        const typeTags = {
+            production: { label: '生產設備', class: 'tag-prod' },
+            inspection: { label: '檢驗設備', class: 'tag-insp' }
+        };
+
+        const dimensionLabels = ['數據取得', '通訊連網', '數據結構化', '系統整合', '智能應用'];
+        let radarChart, donutChart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderEquipmentGrid('all');
+            renderDonutChart();
+            renderRadarChart();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('filter-buttons').addEventListener('click', (event) => {
+                if (event.target.tagName === 'BUTTON') {
+                    const filter = event.target.dataset.filter;
+                    renderEquipmentGrid(filter);
+                    
+                    document.querySelectorAll('#filter-buttons button').forEach(btn => btn.classList.remove('active'));
+                    event.target.classList.add('active');
+                }
+            });
+
+            document.getElementById('back-to-dashboard').addEventListener('click', showDashboardView);
+        }
+
+        function renderEquipmentGrid(filter) {
+            const grid = document.getElementById('equipment-grid');
+            grid.innerHTML = '';
+            const filteredData = equipmentData.filter(e => filter === 'all' || e.type === filter);
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'equipment-card p-4 bg-white border border-gray-200 rounded-lg cursor-pointer';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-lg font-bold text-gray-800">${item.name}</h4>
+                        <span class="tag ${typeTags[item.type].class}">${typeTags[item.type].label}</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">${item.brand} / ${item.model}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">成熟度等級</span>
+                        <span class="tag ${maturityLevels[item.maturity.level].class}">${maturityLevels[item.maturity.level].label}</span>
+                    </div>
+                `;
+                card.addEventListener('click', () => showDetailView(item.id));
+                grid.appendChild(card);
+            });
+        }
+        
+        function showDetailView(equipmentId) {
+            const item = equipmentData.find(e => e.id === equipmentId);
+            if (!item) return;
+
+            const detailContent = document.getElementById('detail-content');
+            detailContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                    <div class="md:col-span-2">
+                        <h2 class="text-3xl font-bold text-gray-900">${item.name}</h2>
+                        <p class="text-md text-gray-500 mt-1 mb-4">${item.brand} / ${item.model}</p>
+                        <div class="space-x-2 mb-6">
+                            <span class="tag ${typeTags[item.type].class}">${typeTags[item.type].label}</span>
+                            <span class="tag ${maturityLevels[item.maturity.level].class}">${maturityLevels[item.maturity.level].label}</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 border-l-4 border-blue-800 pl-3">規格與說明</h3>
+                        <p class="text-gray-700 leading-relaxed">${item.description}</p>
+                    </div>
+                    <div class="md:col-span-3">
+                        <h3 class="text-xl font-semibold mb-3 border-l-4 border-blue-800 pl-3">智慧化成熟度評估</h3>
+                        <div class="chart-container mb-4" style="height: 300px;">
+                            <canvas id="detailBarChart"></canvas>
+                        </div>
+                        <p class="bg-gray-100 p-4 rounded-md text-gray-700"><span class="font-bold">評估說明：</span>${item.maturity.rationale}</p>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-gray-200">
+                     <h3 class="text-2xl font-bold mb-4 text-gray-900">智慧化整合規劃建議</h3>
+                     <div class="space-y-6">
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">1. 建議連網方式</h4>
+                            <p class="text-gray-700 mt-1">${item.integration.networking}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">2. 建議介接方式</h4>
+                            <p class="text-gray-700 mt-1">${item.integration.interfacing}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">3. 建議資訊處理流程</h4>
+                            <p class="text-gray-700 mt-1">${item.integration.dataFlow}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">4. 建議資訊輸出格式</h4>
+                            <pre class="bg-gray-800 text-white p-3 rounded-md text-sm mt-1"><code>${item.integration.dataFormat}</code></pre>
+                        </div>
+                     </div>
+                </div>
+            `;
+            renderDetailBarChart(item.maturity.scores);
+
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function showDashboardView() {
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+        }
+
+        function renderDetailBarChart(scores) {
+            const ctx = document.getElementById('detailBarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dimensionLabels,
+                    datasets: [{
+                        label: '評分 (0-5)',
+                        data: scores,
+                        backgroundColor: 'rgba(30, 64, 175, 0.6)',
+                        borderColor: 'rgba(30, 64, 175, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, max: 5, grid: { color: 'rgba(200, 200, 200, 0.2)' } },
+                        y: { grid: { color: 'rgba(200, 200, 200, 0.1)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderDonutChart() {
+            const ctx = document.getElementById('maturityDonutChart').getContext('2d');
+            const levelCounts = equipmentData.reduce((acc, item) => {
+                acc[item.maturity.level] = (acc[item.maturity.level] || 0) + 1;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(levelCounts).map(level => maturityLevels[level].label);
+            const data = Object.values(levelCounts);
+            const backgroundColors = Object.keys(levelCounts).map(level => {
+                 const colorMap = { '1': '#FEF3C7', '2': '#D1FAE5', '3': '#DBEAFE', '4': '#FCE7F3' };
+                 return colorMap[level];
+            });
+
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '設備數量',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: '#f8fafc',
+                        borderWidth: 3,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 15 } }
+                    }
+                }
+            });
+        }
+
+        function renderRadarChart() {
+            const ctx = document.getElementById('maturityRadarChart').getContext('2d');
+            const datasets = equipmentData.map((item, index) => {
+                const colors = [
+                    'rgba(239, 68, 68, 0.5)', 'rgba(249, 115, 22, 0.5)', 'rgba(234, 179, 8, 0.5)',
+                    'rgba(34, 197, 94, 0.5)', 'rgba(14, 165, 233, 0.5)', 'rgba(99, 102, 241, 0.5)', 'rgba(168, 85, 247, 0.5)'
+                ];
+                const borderColors = [
+                    'rgba(239, 68, 68, 1)', 'rgba(249, 115, 22, 1)', 'rgba(234, 179, 8, 1)',
+                    'rgba(34, 197, 94, 1)', 'rgba(14, 165, 233, 1)', 'rgba(99, 102, 241, 1)', 'rgba(168, 85, 247, 1)'
+                ];
+
+                return {
+                    label: item.name,
+                    data: item.maturity.scores,
+                    fill: true,
+                    backgroundColor: colors[index % colors.length],
+                    borderColor: borderColors[index % borderColors.length],
+                    pointBackgroundColor: borderColors[index % borderColors.length],
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: borderColors[index % borderColors.length]
+                };
+            });
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: dimensionLabels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 14 } },
+                            min: 0,
+                            max: 5,
+                            ticks: { stepSize: 1, backdropColor: 'transparent' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 6,
+                                padding: 20
+                            }
+                        }
+                    },
+                     onClick: (evt, elements, chart) => {
+                        if (elements.length > 0) {
+                            const datasetIndex = elements[0].datasetIndex;
+                            const equipmentId = equipmentData[datasetIndex].id;
+                            showDetailView(equipmentId);
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+

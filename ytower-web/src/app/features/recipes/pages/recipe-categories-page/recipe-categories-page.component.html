@@ -1,0 +1,55 @@
+<div class="categories-page">
+  <div class="container">
+    <app-breadcrumb [items]="breadcrumbItems" />
+    
+    <header class="page-header">
+      <h1 class="page-header__title">楊桃美食網主題總分類</h1>
+      <p class="page-header__subtitle">全台最齊全，各類文字、影音食譜都在這裡</p>
+    </header>
+
+    <div class="categories-grid">
+      @for (category of categories(); track category.id) {
+        <a [routerLink]="['/recipes/category', category.id]" class="category-item">
+          <div class="category-item__image">
+            <img [src]="category.imageUrl" [alt]="category.title" loading="lazy">
+            <div class="category-item__overlay"></div>
+          </div>
+          <h3 class="category-item__title">{{ category.title }}</h3>
+        </a>
+      }
+    </div>
+  </div>
+
+  <!-- Products Section -->
+  <section class="products-section">
+    <div class="container">
+      <h2 class="section-title">楊桃購物網人氣廚具推薦</h2>
+      <div class="products-banner">
+        <div class="product-banner-item">
+          <img src="https://via.placeholder.com/400x300" alt="不鏽鋼保鮮盒">
+          <div class="product-banner-item__info">
+            <span class="product-banner-item__brand">Arnest 日本製</span>
+            <h3 class="product-banner-item__name">燕三條 不鏽鋼保鮮盒七件組×2</h3>
+            <div class="product-banner-item__price">
+              <span class="price-original">原價$2,000</span>
+              <span class="price-sale">優惠價 $1,499</span>
+            </div>
+          </div>
+        </div>
+        <div class="product-banner-item">
+          <img src="https://via.placeholder.com/400x300" alt="氣炸鍋">
+          <div class="product-banner-item__info">
+            <span class="product-banner-item__brand">Cuisinart</span>
+            <h3 class="product-banner-item__name">美式經典氣炸鍋</h3>
+            <div class="product-banner-item__price">
+              <span class="price-sale">$3,980</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <app-cta-section />
+</div>
+

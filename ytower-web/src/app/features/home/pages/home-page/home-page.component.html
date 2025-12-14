@@ -1,0 +1,213 @@
+<!-- Hero Section -->
+<app-hero />
+
+<!-- AI Section -->
+<section class="ai-section">
+  <div class="container-custom">
+    <div class="ai-section__content">
+      <h2 class="ai-section__title">今晚想吃什麼？沒有想法？</h2>
+      <p class="ai-section__subtitle">讓 AI 幫你想今晚吃什麼！</p>
+      <a routerLink="/ai-assistant" class="ai-section__btn">
+        <span>✨</span> 前往 AI 食譜助手
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Recipes Section -->
+<section class="recipes-section">
+  <div class="container-custom">
+    <div class="section-header">
+      <h2 class="section-title">Recipes 今晚吃什麼？</h2>
+      <a routerLink="/recipes" class="section-link">瀏覽所有食譜 →</a>
+    </div>
+
+    <div class="recipes-grid">
+      @for (recipe of popularRecipes; track recipe.id) {
+        <a [routerLink]="['/recipes', recipe.id]" class="recipe-card">
+          <div class="recipe-card__image">
+            <img [src]="recipe.imageUrl" [alt]="recipe.title" loading="lazy">
+          </div>
+          <div class="recipe-card__content">
+            <h3 class="recipe-card__title">{{ recipe.title }}</h3>
+            <div class="recipe-card__meta">
+              <span class="recipe-card__time">⏱️ {{ recipe.cookingTime }} 分鐘</span>
+              <div class="recipe-card__rating">
+                @for (star of getStars(recipe.rating); track $index) {
+                  <span [class.filled]="star === 1">★</span>
+                }
+              </div>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Themes Section -->
+<section class="themes-section">
+  <div class="container-custom">
+    <div class="section-header">
+      <h2 class="section-title">Suggest 推薦食譜主題</h2>
+      <a routerLink="/recipes/categories" class="section-link">查看所有分類 →</a>
+    </div>
+
+    <div class="themes-grid">
+      @for (theme of featuredThemes; track theme.slug) {
+        <a [routerLink]="['/recipes/category', theme.slug]" class="theme-card">
+          <div class="theme-card__image">
+            <img [src]="theme.imageUrl" [alt]="theme.title" loading="lazy">
+            <div class="theme-card__overlay"></div>
+          </div>
+          <div class="theme-card__content">
+            <h3 class="theme-card__title">{{ theme.title }}</h3>
+            <p class="theme-card__desc">{{ theme.description }}</p>
+            <span class="theme-card__cta">查看此分類 →</span>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- News Section -->
+<section class="news-section">
+  <div class="container-custom">
+    <div class="news-section__wrapper">
+      <!-- Left: Title -->
+      <div class="news-section__left">
+        <span class="news-section__label">NEWS</span>
+        <h2 class="news-section__title">What's Cooking？</h2>
+        <p class="news-section__subtitle">最新活動、企劃和靈感通通在這裡</p>
+        <a routerLink="/news" class="news-section__link">查看完整文章內容 →</a>
+      </div>
+
+      <!-- Right: News List -->
+      <div class="news-section__right">
+        <!-- Category Tabs -->
+        <div class="news-section__tabs">
+          @for (category of newsCategories; track category) {
+            <button
+              type="button"
+              class="news-section__tab"
+              [class.news-section__tab--active]="selectedNewsCategory() === category"
+              (click)="selectNewsCategory(category)"
+            >
+              {{ category }}
+            </button>
+          }
+        </div>
+
+        <!-- News List -->
+        <div class="news-section__list">
+          @for (news of filteredNews(); track news.id) {
+            <a [routerLink]="['/news', news.id]" class="news-item">
+              <span class="news-item__date">{{ news.publishDate }}</span>
+              <span class="news-item__category" [attr.data-category]="news.category">{{ news.category }}</span>
+              <span class="news-item__title">{{ news.title }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Products Section -->
+<section class="products-section">
+  <div class="container-custom">
+    <div class="section-header">
+      <h2 class="section-title">Products 把好產品帶回家！</h2>
+      <a href="https://shop.ytower.com.tw" target="_blank" class="section-link">前往楊桃購物網 →</a>
+    </div>
+
+    <div class="products-grid">
+      @for (product of products; track product.id) {
+        <a [href]="product.purchaseUrl" target="_blank" class="product-card">
+          <div class="product-card__image">
+            <img [src]="product.imageUrl" [alt]="product.name" loading="lazy">
+            @if (product.discount) {
+              <span class="product-card__badge">{{ product.discount }}</span>
+            }
+          </div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">{{ product.name }}</h3>
+            <div class="product-card__price">
+              @if (product.originalPrice) {
+                <span class="product-card__original-price">NT$ {{ product.originalPrice }}</span>
+              }
+              <span class="product-card__current-price">NT$ {{ product.price }}</span>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Brand Story Section -->
+<section class="brand-story-section">
+  <div class="container-custom">
+    <div class="brand-story__wrapper">
+      <!-- Left: Facebook Embed -->
+      <div class="brand-story__facebook">
+        <iframe
+          src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fytower01&tabs=timeline,events,messages&width=400&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+          width="400"
+          height="500"
+          style="border:none;overflow:hidden"
+          scrolling="no"
+          frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          loading="lazy"
+          title="楊桃美食網 Facebook 粉絲專頁"
+        ></iframe>
+      </div>
+
+      <!-- Right: Brand Story Content -->
+      <div class="brand-story__card">
+        <h2 class="brand-story__title">用美食連結彼此，用科技開啟未來</h2>
+
+        <div class="brand-story__content">
+          <p>
+            楊桃美食網已成立超過 27 年，累積三萬篇食譜與六千部影音，陪伴數百萬人走過每一餐的選擇<br>
+            我們相信，美食不只是食材與料理，而是連結家人、朋友與文化的語言
+          </p>
+
+          <p>
+            AI 驅動的時代，我們持續轉型，將專業內容與智慧科技結合<br>
+            打造專屬的食譜體驗，讓「今晚吃什麼」不再是難題
+          </p>
+
+          <p>
+            從經典家常到快速料理，從靈感到實際行動<br>
+            楊桃美食提供最值得信賴的知識與服務，讓料理成為生活裡最自然的樂趣
+          </p>
+        </div>
+
+        <a routerLink="/about" class="brand-story__btn">想更了解我們的故事與堅持？</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container-custom">
+    <div class="cta-grid">
+      <div class="cta-card cta-card--shop">
+        <h3>讓料理更順手，開啟專屬的美味日常</h3>
+        <p>料理不只是餐桌上的片刻，還能透過食材與器具延續美好的日常</p>
+        <a href="https://shop.ytower.com.tw" target="_blank" class="cta-btn cta-btn--primary">前往楊桃購物網</a>
+      </div>
+      <div class="cta-card cta-card--contact">
+        <h3>把想說的話告訴我們</h3>
+        <p>無論是合作的提案、料理上的疑問，都歡迎寫信或留言給我們</p>
+        <a routerLink="/contact" class="cta-btn cta-btn--secondary">立即聯絡楊桃團隊</a>
+      </div>
+    </div>
+  </div>
+</section>
+

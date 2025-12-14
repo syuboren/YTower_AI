@@ -1,0 +1,132 @@
+<div class="recipe-list-page">
+  <!-- Hero Section with AI Search -->
+  <section class="search-hero">
+    <div class="container">
+      <h1 class="search-hero__title">今天吃什麼？</h1>
+      <p class="search-hero__subtitle">不知道想吃什麼？讓 AI 幫你出主意！一句話變出百萬種可能</p>
+      <div class="search-hero__input">
+        <app-ai-input-box 
+          [placeholder]="'輸入食材或口味偏好...'"
+          [buttonText]="'✨ AI 生成食譜'"
+          (generate)="onAiGenerate($event)"
+        />
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <app-breadcrumb [items]="breadcrumbItems" />
+  </div>
+
+  <!-- Featured Categories -->
+  <section class="featured-section">
+    <div class="container">
+      <h2 class="section-title">推薦食譜主題</h2>
+      <div class="featured-grid">
+        @for (category of featuredCategories(); track category.id) {
+          <app-category-card
+            [id]="category.id"
+            [title]="category.title"
+            [imageUrl]="category.imageUrl"
+            [description]="category.description"
+          />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 10 Section -->
+  <section class="top10-section">
+    <div class="container">
+      <h2 class="section-title">Top 10 熱門食譜</h2>
+      <div class="top10-scroll">
+        @for (recipe of topRecipes(); track recipe.id; let i = $index) {
+          <a [routerLink]="['/recipes', recipe.id]" class="top10-card">
+            <div class="top10-card__rank">{{ i + 1 }}</div>
+            <img [src]="recipe.imageUrl" [alt]="recipe.title" class="top10-card__image">
+            <div class="top10-card__info">
+              <h3 class="top10-card__title">{{ recipe.title }}</h3>
+              <div class="top10-card__meta">
+                <span class="top10-card__time">{{ recipe.cookingTime }} 分鐘</span>
+                <span class="top10-card__rating">★ {{ recipe.rating }}</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content with Sidebar -->
+  <section class="main-content">
+    <div class="container">
+      <div class="content-layout">
+        <!-- Recipe Grid -->
+        <div class="content-main">
+          <div class="filter-bar">
+            <h2 class="filter-bar__title">你想吃什麼？先幫你整理好了！</h2>
+            <div class="filter-bar__filters">
+              <select 
+                class="filter-select"
+                [value]="selectedTime()"
+                (change)="selectedTime.set($any($event.target).value)"
+              >
+                @for (option of timeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              <select 
+                class="filter-select"
+                [value]="selectedStyle()"
+                (change)="selectedStyle.set($any($event.target).value)"
+              >
+                @for (option of styleOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="recipe-grid">
+            @for (recipe of recipes(); track recipe.id) {
+              <app-recipe-card
+                [id]="recipe.id"
+                [title]="recipe.title"
+                [imageUrl]="recipe.imageUrl"
+                [cookingTime]="recipe.cookingTime"
+                [rating]="recipe.rating"
+              />
+            }
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="pagination__btn pagination__btn--prev" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <span class="pagination__info">1 / 10</span>
+            <button class="pagination__btn pagination__btn--next">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="content-sidebar">
+          <app-sidebar 
+            [title]="'人氣食譜排行榜'"
+            [recipes]="sidebarRecipes()"
+          />
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <app-cta-section />
+</div>
+

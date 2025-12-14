@@ -1,0 +1,76 @@
+.cta-section {
+  padding: 3rem 0;
+  background: #f9f9f9;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.cta-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 2rem;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 1rem;
+  }
+
+  &__description {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+  }
+
+  &__button {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+
+    &:not(&--outline) {
+      background: #C45D4A;
+      color: #fff;
+
+      &:hover {
+        background: #a84d3d;
+        transform: translateY(-2px);
+      }
+    }
+
+    &--outline {
+      background: transparent;
+      color: #C45D4A;
+      border: 2px solid #C45D4A;
+
+      &:hover {
+        background: #C45D4A;
+        color: #fff;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+

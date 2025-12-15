@@ -8,6 +8,8 @@
   [![Angular](https://img.shields.io/badge/Angular-18.2-dd0031?logo=angular)](https://angular.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178c6?logo=typescript)](https://www.typescriptlang.org/)
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
+  
+  ### 🌐 [線上預覽 Demo](https://syuboren.github.io/YTower_AI/)
 </div>
 
 ---
@@ -40,13 +42,16 @@
 
 #### AI 食譜助手 (AI Assistant) - 「食之召喚」系統
 - [x] 食材輸入介面
+  - 手動輸入食材名稱
+  - 🎲 隨機食材按鈕（一鍵新增不重複食材）
 - [x] 食材卡牌生成（收藏卡風格）
   - 真實食材照片
   - 元素屬性系統（炎、水、地、風、光）
   - 光澤邊框效果
   - 選中/刪除功能
 - [x] 五芒星魔法陣
-  - SVG 繪製動畫
+  - SVG 繪製動畫（初始描繪）
+  - ✨ 白色光點持續循環流動效果
   - 5 個卡槽設計
   - 最多選擇 5 種食材
 - [x] 融合動畫流程（5 階段）
@@ -57,8 +62,8 @@
   5. 爆發過渡：Logo 旋轉進場 + 光環擴散
 - [x] 食譜結果頁面
   - 收藏卡風格設計
-  - 稀有度等級（銀/金/紫）
-  - 進場動畫
+  - 稀有度等級（銀/金/紫 金屬光澤邊框）
+  - 進場動畫（翻牌效果）
   - 缺少食材提示
 - [x] 食譜詳情彈窗
   - 完整烹調步驟
@@ -197,6 +202,18 @@ ng build
 # 生產建置
 ng build --configuration production
 ```
+
+### 🚀 部署到 GitHub Pages
+
+```bash
+# 1. 建置生產版本（設定正確的 base-href）
+ng build --configuration production --base-href /YTower_AI/
+
+# 2. 部署到 gh-pages 分支
+npx angular-cli-ghpages --dir=dist/ytower-web/browser
+```
+
+**線上版本**：https://syuboren.github.io/YTower_AI/
 
 ---
 

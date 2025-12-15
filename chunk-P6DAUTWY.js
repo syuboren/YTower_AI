@@ -1,0 +1,1 @@
+import"./chunk-2VMXMS7J.js";var t=[{path:"",loadComponent:()=>import("./chunk-TAHTJ4D6.js").then(o=>o.AboutPageComponent),title:"\u95DC\u65BC\u6211\u5011 | \u694A\u6843\u7F8E\u98DF\u7DB2"}];export{t as aboutRoutes};

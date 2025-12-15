@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, AfterViewInit, ElementRef, PLATFORM_ID, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, AfterViewInit, ElementRef, PLATFORM_ID, HostListener, ChangeDetectorRef, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BreadcrumbComponent, RecipeCardComponent, CategoryCardComponent, SidebarComponent, CtaSectionComponent } from '../../../../shared/components';
 import { MockDataService } from '../../../../core/services/mock-data.service';
 
@@ -24,16 +25,28 @@ type ViewMode = 'bento' | 'list';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RecipeListPageComponent implements AfterViewInit {
+export class RecipeListPageComponent implements AfterViewInit, OnInit {
   private mockDataService = inject(MockDataService);
   private elementRef = inject(ElementRef);
   private platformId = inject(PLATFORM_ID);
   private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
   private observer: IntersectionObserver | null = null;
 
-  breadcrumbItems = [
-    { label: '食譜專區' }
-  ];
+  // 當前搜尋的主題名稱（來自 URL 查詢參數）
+  currentThemeName = signal<string>('');
+
+  breadcrumbItems = computed(() => {
+    const themeName = this.currentThemeName();
+    if (themeName) {
+      return [
+        { label: '食譜專區', path: '/recipes' },
+        { label: themeName }
+      ];
+    }
+    return [{ label: '食譜專區' }];
+  });
 
   // 搜尋相關
   searchQuery = signal('');
@@ -69,14 +82,15 @@ export class RecipeListPageComponent implements AfterViewInit {
     
     let results = this.allRecipes();
 
-    // 關鍵字搜尋
+    // 關鍵字搜尋（包含主題標籤）
     if (query) {
       results = results.filter(recipe => 
         recipe.title.toLowerCase().includes(query) ||
         recipe.description.toLowerCase().includes(query) ||
         recipe.tags.some(tag => tag.toLowerCase().includes(query)) ||
         recipe.ingredients.some(ing => ing.name.toLowerCase().includes(query)) ||
-        recipe.cookingStyles?.some(s => s.toLowerCase().includes(query))
+        recipe.cookingStyles?.some(s => s.toLowerCase().includes(query)) ||
+        recipe.themes?.some(t => t.toLowerCase().includes(query))
       );
     }
 
@@ -171,6 +185,27 @@ export class RecipeListPageComponent implements AfterViewInit {
     return patterns[index % patterns.length];
   }
 
+  ngOnInit(): void {
+    // 監聽 URL 查詢參數變化
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const query = params['q'];
+        if (query) {
+          // 有查詢參數時，設置搜尋關鍵字並進入搜尋模式
+          this.searchQuery.set(query);
+          this.currentThemeName.set(query);
+          this.hasSearched.set(true);
+          this.currentPage.set(1);
+          this.cdr.detectChanges();
+          setTimeout(() => this.initScrollAnimations(), 50);
+        } else {
+          // 沒有查詢參數時重置
+          this.currentThemeName.set('');
+        }
+      });
+  }
+
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.initScrollAnimations();
@@ -207,6 +242,8 @@ export class RecipeListPageComponent implements AfterViewInit {
 
   // 執行搜尋
   onSearch(): void {
+    // 清除從 URL 帶來的主題名稱，使用新輸入的搜尋關鍵字
+    this.currentThemeName.set('');
     this.hasSearched.set(true);
     this.currentPage.set(1);
     this.isSearching.set(true);

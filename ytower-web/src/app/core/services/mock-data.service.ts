@@ -51,9 +51,9 @@ export class MockDataService {
       ],
       kitchenware: [{ id: 'k1', name: 'Woody 木質調磨石陶瓷瓶底深鍋 26cm', imageUrl: '', price: 1800, purchaseUrl: '#' }],
       tags: ['中式經典', '快速料理', '豆腐'],
-      categories: ['快速料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['川菜']
+      cookingStyles: ['川菜'],
+      themes: ['快速料理', '餐別與時段', '預算與成本']
     },
     {
       id: '2',
@@ -73,9 +73,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '將所有蔬菜洗淨，切成適當大小。' }],
       kitchenware: [],
       tags: ['健康', '素食'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['健康飲食', '特殊需求', '快速料理']
     },
     {
       id: '3',
@@ -94,9 +94,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '生菜洗淨瀝乾，撕成適口大小。' }],
       kitchenware: [],
       tags: ['健康', '輕食'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐'],
-      cookingStyles: ['地中海料理']
+      cookingStyles: ['地中海料理'],
+      themes: ['健康飲食', '快速料理', '便當、外帶']
     },
     {
       id: '4',
@@ -115,9 +115,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '香菇洗淨去蒂。' }],
       kitchenware: [],
       tags: ['素食', '簡單'],
-      categories: ['快速料理'],
       mealTypes: ['配菜'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['快速料理', '特殊需求', '預算與成本']
     },
     {
       id: '5',
@@ -136,9 +136,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '蘿蔓生菜洗淨切段。' }],
       kitchenware: [],
       tags: ['沙拉', '經典'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐'],
-      cookingStyles: ['美式']
+      cookingStyles: ['美式'],
+      themes: ['健康飲食', '快速料理', '餐別與時段']
     },
     {
       id: '6',
@@ -157,9 +157,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '番茄切塊，雞蛋打散備用。' }],
       kitchenware: [],
       tags: ['家常', '下飯', '雞蛋'],
-      categories: ['快速料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '親子學習', '預算與成本']
     },
     {
       id: '7',
@@ -178,9 +178,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞腿排抹上調味料醃製30分鐘。' }],
       kitchenware: [],
       tags: ['雞肉', '下飯', '便當菜'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['便當、外帶', '餐別與時段', '預算與成本']
     },
     {
       id: '8',
@@ -199,9 +199,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '水煮滾後加入豆腐和海帶芽。' }],
       kitchenware: [],
       tags: ['湯品', '健康', '豆腐'],
-      categories: ['健康飲食'],
       mealTypes: ['早餐', '午餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['健康飲食', '餐別與時段', '快速料理']
     },
     {
       id: '9',
@@ -220,9 +220,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '年糕泡水軟化備用。' }],
       kitchenware: [],
       tags: ['韓式', '辣', '小吃'],
-      categories: ['異國料理'],
       mealTypes: ['點心', '晚餐'],
-      cookingStyles: ['韓式']
+      cookingStyles: ['韓式'],
+      themes: ['餐別與時段', '親子學習', '節慶主題']
     },
     {
       id: '10',
@@ -241,9 +241,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '義大利麵依包裝指示煮熟。' }],
       kitchenware: [],
       tags: ['義式', '麵食', '奶油'],
-      categories: ['異國料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['餐別與時段', '親子學習']
     },
     {
       id: '11',
@@ -262,9 +262,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '鱸魚清洗乾淨，在魚身劃刀。' }],
       kitchenware: [],
       tags: ['清蒸', '海鮮', '健康'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['健康飲食', '時令與永續', '器具與空間']
     },
     {
       id: '12',
@@ -283,9 +283,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '五花肉切成小丁。' }],
       kitchenware: [],
       tags: ['台式', '經典', '滷味'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['餐別與時段', '便當、外帶', '節慶主題']
     },
     {
       id: '13',
@@ -304,9 +304,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '馬鈴薯、紅蘿蔔切塊備用。' }],
       kitchenware: [],
       tags: ['咖哩', '素食', '健康'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['健康飲食', '特殊需求', '親子學習']
     },
     {
       id: '14',
@@ -325,9 +325,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '將所有材料攪拌均勻成麵糊。' }],
       kitchenware: [],
       tags: ['甜點', '法式', '雞蛋'],
-      categories: ['甜點烘焙'],
       mealTypes: ['下午茶', '早餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['餐別與時段', '親子學習', '節慶主題']
     },
     {
       id: '15',
@@ -346,9 +346,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '辣椒、蒜頭切末備用。' }],
       kitchenware: [],
       tags: ['泰式', '辣', '快速'],
-      categories: ['快速料理', '異國料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['泰式']
+      cookingStyles: ['泰式'],
+      themes: ['快速料理', '餐別與時段', '預算與成本']
     },
     {
       id: '16',
@@ -367,9 +367,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '馬鈴薯洗淨，放入烤箱烤熟。' }],
       kitchenware: [],
       tags: ['焗烤', '馬鈴薯', '起司'],
-      categories: ['異國料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['親子學習', '器具與空間', '餐別與時段']
     },
     {
       id: '17',
@@ -388,9 +388,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '鮭魚煎熟後撥成小塊。' }],
       kitchenware: [],
       tags: ['日式', '健康', '海鮮'],
-      categories: ['快速料理'],
       mealTypes: ['午餐', '宵夜'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['快速料理', '健康飲食', '餐別與時段']
     },
     {
       id: '18',
@@ -409,9 +409,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '五花肉整塊放入滾水中煮熟。' }],
       kitchenware: [],
       tags: ['川菜', '冷盤', '豬肉'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['餐別與時段', '節慶主題', '時令與永續']
     },
     // === 快速料理 ===
     {
@@ -431,9 +431,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '蛋餅皮放入平底鍋，打入雞蛋。' }],
       kitchenware: [],
       tags: ['早餐', '快速', '雞蛋'],
-      categories: ['快速料理'],
       mealTypes: ['早餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '餐別與時段', '預算與成本']
     },
     {
       id: '20',
@@ -452,9 +452,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '小黃瓜拍碎切段。' }],
       kitchenware: [],
       tags: ['涼拌', '快速', '素食'],
-      categories: ['快速料理'],
       mealTypes: ['配菜'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '健康飲食', '時令與永續']
     },
     {
       id: '21',
@@ -473,9 +473,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '蒜頭切片爆香。' }],
       kitchenware: [],
       tags: ['素食', '快速', '健康'],
-      categories: ['快速料理', '健康飲食'],
       mealTypes: ['配菜'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '健康飲食', '預算與成本']
     },
     {
       id: '22',
@@ -494,9 +494,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '豆腐切塊，皮蛋切瓣。' }],
       kitchenware: [],
       tags: ['涼拌', '快速', '豆腐'],
-      categories: ['快速料理'],
       mealTypes: ['配菜'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '餐別與時段', '預算與成本']
     },
     {
       id: '23',
@@ -515,9 +515,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '杏鮑菇切厚片。' }],
       kitchenware: [],
       tags: ['素食', '快速', '菇類'],
-      categories: ['快速料理'],
       mealTypes: ['配菜'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '特殊需求', '便當、外帶']
     },
     // === 健康飲食 ===
     {
@@ -537,9 +537,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '藜麥洗淨後煮熟放涼。' }],
       kitchenware: [],
       tags: ['健康', '沙拉', '素食'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['健康飲食', '特殊需求', '便當、外帶']
     },
     {
       id: '25',
@@ -558,9 +558,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞胸肉煎熟切片。' }],
       kitchenware: [],
       tags: ['健康', '沙拉', '雞肉'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['健康飲食', '便當、外帶', '預算與成本']
     },
     {
       id: '26',
@@ -579,9 +579,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞蛋打散加入高湯。' }],
       kitchenware: [],
       tags: ['健康', '雞蛋', '簡單'],
-      categories: ['健康飲食', '快速料理'],
       mealTypes: ['配菜'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['快速料理', '親子學習', '預算與成本']
     },
     {
       id: '27',
@@ -600,9 +600,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '燕麥片加牛奶煮滾。' }],
       kitchenware: [],
       tags: ['健康', '早餐', '素食'],
-      categories: ['健康飲食'],
       mealTypes: ['早餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['健康飲食', '餐別與時段', '特殊需求']
     },
     {
       id: '28',
@@ -621,9 +621,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '地瓜蒸熟壓成泥。' }],
       kitchenware: [],
       tags: ['健康', '點心', '素食'],
-      categories: ['健康飲食'],
       mealTypes: ['點心'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['親子學習', '餐別與時段', '特殊需求']
     },
     // === 日式料理 ===
     {
@@ -643,9 +643,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞腿肉煎至金黃。' }],
       kitchenware: [],
       tags: ['日式', '雞肉', '便當菜'],
-      categories: ['日式料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['便當、外帶', '餐別與時段', '預算與成本']
     },
     {
       id: '30',
@@ -664,9 +664,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '豬排用肉槌敲鬆。' }],
       kitchenware: [],
       tags: ['日式', '炸物', '豬肉'],
-      categories: ['日式料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['餐別與時段', '器具與空間']
     },
     {
       id: '31',
@@ -685,9 +685,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞腿肉切塊煮熟。' }],
       kitchenware: [],
       tags: ['日式', '丼飯', '雞肉'],
-      categories: ['日式料理', '快速料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['快速料理', '餐別與時段', '預算與成本']
     },
     {
       id: '32',
@@ -706,9 +706,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '蔬菜和肉切塊炒香。' }],
       kitchenware: [],
       tags: ['日式', '咖哩', '家常'],
-      categories: ['日式料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['親子學習', '餐別與時段', '便當、外帶']
     },
     {
       id: '33',
@@ -727,9 +727,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '鍋中放入醬汁煮滾。' }],
       kitchenware: [],
       tags: ['日式', '火鍋', '牛肉'],
-      categories: ['日式料理'],
       mealTypes: ['晚餐'],
-      cookingStyles: ['日式']
+      cookingStyles: ['日式'],
+      themes: ['節慶主題', '餐別與時段', '器具與空間']
     },
     // === 韓式料理 ===
     {
@@ -749,9 +749,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞翅醃製30分鐘。' }],
       kitchenware: [],
       tags: ['韓式', '炸物', '雞肉'],
-      categories: ['韓式料理'],
       mealTypes: ['晚餐', '宵夜'],
-      cookingStyles: ['韓式']
+      cookingStyles: ['韓式'],
+      themes: ['餐別與時段', '器具與空間', '節慶主題']
     },
     {
       id: '35',
@@ -770,9 +770,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '五花肉炒出油脂。' }],
       kitchenware: [],
       tags: ['韓式', '火鍋', '辣'],
-      categories: ['韓式料理'],
       mealTypes: ['晚餐'],
-      cookingStyles: ['韓式']
+      cookingStyles: ['韓式'],
+      themes: ['餐別與時段', '時令與永續', '器具與空間']
     },
     {
       id: '36',
@@ -791,9 +791,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '各式蔬菜分別炒熟調味。' }],
       kitchenware: [],
       tags: ['韓式', '拌飯', '健康'],
-      categories: ['韓式料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['韓式']
+      cookingStyles: ['韓式'],
+      themes: ['健康飲食', '餐別與時段', '便當、外帶']
     },
     {
       id: '37',
@@ -812,9 +812,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '麵粉加水調成麵糊。' }],
       kitchenware: [],
       tags: ['韓式', '煎餅', '素食'],
-      categories: ['韓式料理', '快速料理'],
       mealTypes: ['點心'],
-      cookingStyles: ['韓式']
+      cookingStyles: ['韓式'],
+      themes: ['快速料理', '餐別與時段', '親子學習']
     },
     {
       id: '38',
@@ -833,9 +833,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '所有食材放入鍋中。' }],
       kitchenware: [],
       tags: ['韓式', '火鍋', '辣'],
-      categories: ['韓式料理'],
       mealTypes: ['晚餐', '宵夜'],
-      cookingStyles: ['韓式']
+      cookingStyles: ['韓式'],
+      themes: ['餐別與時段', '預算與成本', '器具與空間']
     },
     // === 西式料理 ===
     {
@@ -855,9 +855,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '洋蔥切丁炒香。' }],
       kitchenware: [],
       tags: ['義式', '燉飯', '奶油'],
-      categories: ['異國料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['餐別與時段', '器具與空間']
     },
     {
       id: '40',
@@ -876,9 +876,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '義大利麵煮至彈牙。' }],
       kitchenware: [],
       tags: ['義式', '麵食', '海鮮'],
-      categories: ['異國料理', '快速料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['快速料理', '餐別與時段', '時令與永續']
     },
     {
       id: '41',
@@ -897,9 +897,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '絞肉加調味料攪拌至黏性。' }],
       kitchenware: [],
       tags: ['西式', '牛肉', '便當菜'],
-      categories: ['異國料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['便當、外帶', '親子學習', '餐別與時段']
     },
     {
       id: '42',
@@ -918,9 +918,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '蘑菇切片炒香。' }],
       kitchenware: [],
       tags: ['西式', '湯品', '奶油'],
-      categories: ['異國料理'],
       mealTypes: ['配菜'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['餐別與時段', '時令與永續', '器具與空間']
     },
     {
       id: '43',
@@ -939,9 +939,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '蛋液加牛奶拌勻。' }],
       kitchenware: [],
       tags: ['西式', '早餐', '甜點'],
-      categories: ['異國料理', '快速料理'],
       mealTypes: ['早餐', '下午茶'],
-      cookingStyles: ['西式']
+      cookingStyles: ['西式'],
+      themes: ['快速料理', '餐別與時段', '親子學習']
     },
     // === 中式經典 ===
     {
@@ -961,9 +961,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞肉切丁醃製。' }],
       kitchenware: [],
       tags: ['川菜', '雞肉', '辣'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['餐別與時段', '便當、外帶', '預算與成本']
     },
     {
       id: '45',
@@ -982,9 +982,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '排骨切塊汆燙。' }],
       kitchenware: [],
       tags: ['中式', '糖醋', '豬肉'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['親子學習', '節慶主題', '餐別與時段']
     },
     {
       id: '46',
@@ -1003,9 +1003,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '牛腩切塊汆燙去血水。' }],
       kitchenware: [],
       tags: ['中式', '燉煮', '牛肉'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['節慶主題', '餐別與時段', '器具與空間']
     },
     {
       id: '47',
@@ -1024,9 +1024,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '雞腿剁塊。' }],
       kitchenware: [],
       tags: ['台式', '雞肉', '下飯'],
-      categories: ['家常料理'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['餐別與時段', '便當、外帶', '預算與成本']
     },
     {
       id: '48',
@@ -1045,9 +1045,9 @@ export class MockDataService {
       steps: [{ stepNumber: 1, description: '魚清洗乾淨。' }],
       kitchenware: [],
       tags: ['清蒸', '海鮮', '健康'],
-      categories: ['健康飲食'],
       mealTypes: ['午餐', '晚餐'],
-      cookingStyles: ['中式']
+      cookingStyles: ['中式'],
+      themes: ['健康飲食', '時令與永續', '器具與空間']
     }
   ];
 

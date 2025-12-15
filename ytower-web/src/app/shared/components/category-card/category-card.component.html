@@ -1,4 +1,4 @@
-<a [routerLink]="['/recipes/category', id()]" class="category-card">
+<a [routerLink]="['/recipes']" [queryParams]="{q: title()}" class="category-card">
   <div class="category-card__image-wrapper">
     <img [src]="imageUrl()" [alt]="title()" class="category-card__image" loading="lazy">
     <div class="category-card__overlay"></div>

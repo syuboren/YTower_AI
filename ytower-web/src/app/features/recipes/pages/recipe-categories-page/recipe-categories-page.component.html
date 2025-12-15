@@ -9,7 +9,7 @@
 
     <div class="categories-grid">
       @for (category of categories(); track category.id) {
-        <a [routerLink]="['/recipes/category', category.id]" class="category-item">
+        <a [routerLink]="['/recipes']" [queryParams]="{q: category.title}" class="category-item">
           <div class="category-item__image">
             <img [src]="category.imageUrl" [alt]="category.title" loading="lazy">
             <div class="category-item__overlay"></div>
@@ -25,27 +25,28 @@
     <div class="container">
       <h2 class="section-title">楊桃購物網人氣廚具推薦</h2>
       <div class="products-banner">
-        <div class="product-banner-item">
-          <img src="https://via.placeholder.com/400x300" alt="不鏽鋼保鮮盒">
+        <a href="https://shop.ytower.com.tw/products/ikh-35030" target="_blank" class="product-banner-item">
+          <img src="https://shoplineimg.com/6200f43d76759e003faa9414/65d325a3f574ae00178ca98c/800x.webp?source_format=jpg" alt="日式黑金鋼鐵板燒鍋">
           <div class="product-banner-item__info">
-            <span class="product-banner-item__brand">Arnest 日本製</span>
-            <h3 class="product-banner-item__name">燕三條 不鏽鋼保鮮盒七件組×2</h3>
+            <span class="product-banner-item__brand">PERFECT理想</span>
+            <h3 class="product-banner-item__name">日式黑金鋼鐵板燒鍋36cm 附蓋</h3>
             <div class="product-banner-item__price">
-              <span class="price-original">原價$2,000</span>
-              <span class="price-sale">優惠價 $1,499</span>
+              <span class="price-original">原價$2,880</span>
+              <span class="price-sale">優惠價 $1,280</span>
             </div>
           </div>
-        </div>
-        <div class="product-banner-item">
-          <img src="https://via.placeholder.com/400x300" alt="氣炸鍋">
+        </a>
+        <a href="https://shop.ytower.com.tw/products/83923-t" target="_blank" class="product-banner-item">
+          <img src="https://shoplineimg.com/6200f43d76759e003faa9414/6567243a061a0400146b03fc/800x.webp?source_format=jpg" alt="圓滿導磁不沾炒鍋">
           <div class="product-banner-item__info">
-            <span class="product-banner-item__brand">Cuisinart</span>
-            <h3 class="product-banner-item__name">美式經典氣炸鍋</h3>
+            <span class="product-banner-item__brand">MEYER美亞</span>
+            <h3 class="product-banner-item__name">Circulon Total圓滿導磁不沾炒鍋26cm</h3>
             <div class="product-banner-item__price">
-              <span class="price-sale">$3,980</span>
+              <span class="price-original">原價$4,200</span>
+              <span class="price-sale">優惠價 $1,480</span>
             </div>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>

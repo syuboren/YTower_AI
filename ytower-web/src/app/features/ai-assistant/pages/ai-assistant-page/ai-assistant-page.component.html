@@ -17,8 +17,196 @@
       <!-- INPUT 狀態 -->
       @if (gameState() === 'INPUT') {
         <div class="game-input">
-          <div class="game-input__layout">
-            <!-- 左側：五芒星魔法陣 -->
+          <!-- 第一列：標題與說明 -->
+          <div class="game-input__info">
+            <h1 class="game-input__title">AI 食譜生成助手</h1>
+            <h2 class="game-input__subtitle">從靈感到餐桌，只要一個步驟</h2>
+            <p class="game-input__desc">
+              冰箱有剩菜卻不知道能做什麼？讓 AI 幫你想！輸入食材，系統將為您推薦最適合的料理方案。
+            </p>
+          </div>
+
+          <!-- 第二列：輸入框與按鈕 -->
+          <form class="ingredient-input ingredient-input--center" (submit)="handleAddIngredient($event)">
+            <input
+              type="text"
+              [value]="inputValue()"
+              (input)="inputValue.set($any($event.target).value)"
+              [disabled]="isProcessing()"
+              [placeholder]="isProcessing() ? '分析中...' : '輸入食材或描述（如：冰箱裡有雞蛋、番茄、豆腐）'"
+              class="ingredient-input__field"
+            >
+            <button
+              type="submit"
+              [disabled]="!inputValue() || isProcessing()"
+              class="ingredient-input__btn"
+            >
+              @if (isProcessing()) {
+                <svg class="ingredient-input__spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                <span>生成中</span>
+              } @else {
+                <svg class="ingredient-input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span>新增食材</span>
+              }
+            </button>
+            <button
+              type="button"
+              class="ingredient-input__random"
+              (click)="addRandomIngredient()"
+              title="隨機新增一種食材"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <circle cx="12" cy="12" r="2"/>
+                <path d="M12 6v2M12 16v2M6.93 8.5l1.73 1M15.34 14.5l1.73 1M6.93 15.5l1.73-1M15.34 9.5l1.73-1"/>
+              </svg>
+              <span>隨機食材</span>
+            </button>
+          </form>
+
+          <!-- 分析進度提示 -->
+          @if (analyzingText()) {
+            <div class="analyzing-status">
+              <div class="analyzing-status__indicator">
+                <svg class="analyzing-status__spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                <span class="analyzing-status__text">{{ analyzingText() }}</span>
+              </div>
+              @if (totalToAnalyze() > 0) {
+                <div class="analyzing-status__progress">
+                  <div class="analyzing-status__bar">
+                    <div class="analyzing-status__fill" [style.width.%]="(analyzedCount() / totalToAnalyze()) * 100"></div>
+                  </div>
+                  <span class="analyzing-status__count">{{ analyzedCount() }} / {{ totalToAnalyze() }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- 第三列：食材卡匣清單與五芒星魔法陣並列（同一區塊） -->
+          <div class="game-input__main">
+            <!-- 左側：食材卡匣清單 -->
+            <div class="hand-section">
+              <!-- 手牌標題 -->
+              <div class="hand-area__header">
+                <span class="hand-area__title">
+                  <svg class="hand-area__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                  食材清單 ({{ hand().length }})
+                </span>
+                <span class="hand-area__hint">點擊食材加入魔法陣</span>
+              </div>
+
+              <!-- 卡牌列表 - 使用原本的樣式 -->
+              <div class="hand-cards">
+                @if (hand().length === 0 && !isProcessing()) {
+                  <div class="hand-cards__empty">
+                    <svg class="hand-cards__empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                    <p>輸入食材開始探索...</p>
+                  </div>
+                }
+
+                @if (isProcessing()) {
+                  <div class="card-materializing">
+                    <svg class="card-materializing__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    </svg>
+                    <span class="card-materializing__text">分析中...</span>
+                  </div>
+                }
+
+                <!-- 已生成的卡牌 - 收藏卡風格（原本樣式） -->
+                @for (card of hand(); track card.id) {
+                  <div
+                    class="collector-card"
+                    [class.collector-card--selected]="isSelected(card)"
+                    [style.--element-color]="getElementColor(card.element)"
+                    (click)="toggleSelectCard(card)"
+                  >
+                    <!-- 刪除按鈕 -->
+                    <button
+                      type="button"
+                      class="collector-card__delete"
+                      (click)="removeCard(card, $event)"
+                      title="移除食材"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                      </svg>
+                    </button>
+
+                    <!-- 卡片內容 -->
+                    <div class="collector-card__inner">
+                      <!-- 頂部：名稱 + 數量 -->
+                      <div class="collector-card__header">
+                        <div class="collector-card__title-bar" [style.background]="getElementColor(card.element)">
+                          <span class="collector-card__name">{{ card.name }}</span>
+                        </div>
+                        <div class="collector-card__count">
+                          <span class="collector-card__count-label">×</span>
+                          <span class="collector-card__count-value">1</span>
+                        </div>
+                      </div>
+
+                      <!-- 中間：食材照片 -->
+                      <div class="collector-card__image-frame">
+                        <div class="collector-card__image">
+                          @if (card.img && !hasImageError(card.id)) {
+                            <img [src]="card.img" [alt]="card.name" (error)="handleImageError(card.id)" loading="eager">
+                          } @else {
+                            <div class="collector-card__fallback">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                              </svg>
+                            </div>
+                          }
+                        </div>
+
+                        <!-- 選中標記 -->
+                        @if (isSelected(card)) {
+                          <div class="collector-card__selected-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                              <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                          </div>
+                        }
+                      </div>
+
+                      <!-- 底部：元素標籤 -->
+                      <div class="collector-card__footer">
+                        <div class="collector-card__element" [style.background]="getElementColor(card.element)">
+                          <!-- 元素圖示 -->
+                          @if (card.element === '炎') {
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.9 0-7-3.1-7-7 0-2.8 1.6-5.2 4-6.4V6c0-1.7 1.3-3 3-3s3 1.3 3 3v3.6c2.4 1.2 4 3.6 4 6.4 0 3.9-3.1 7-7 7z"/></svg>
+                          } @else if (card.element === '水') {
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
+                          } @else if (card.element === '地') {
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                          } @else if (card.element === '風') {
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                          } @else {
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/></svg>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- 右側：五芒星魔法陣 -->
             <div class="pentagram-zone">
               <div class="pentagram-container">
                 <!-- 五芒星 SVG 底圖 -->
@@ -125,185 +313,6 @@
               </div>
             </div>
 
-            <!-- 右側：說明文字 -->
-            <div class="game-input__info">
-              <h1 class="game-input__title">AI 食譜生成助手</h1>
-              <h2 class="game-input__subtitle">從靈感到餐桌，只要一個步驟</h2>
-              <p class="game-input__desc">
-                冰箱有剩菜卻不知道能做什麼？讓 AI 幫你想！<br>
-                輸入食材，系統將為您推薦最適合的料理方案。
-              </p>
-              <div class="game-input__stats">
-                <div class="game-input__stat">
-                  <span class="game-input__stat-value">30,000+</span>
-                  <span class="game-input__stat-label">食譜資料庫</span>
-                </div>
-                <div class="game-input__stat">
-                  <span class="game-input__stat-value">AI</span>
-                  <span class="game-input__stat-label">智慧推薦</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 底部：手牌區 + 輸入框 -->
-          <div class="hand-area">
-            <!-- 輸入框 -->
-            <form class="ingredient-input" (submit)="handleAddIngredient($event)">
-              <input
-                type="text"
-                [value]="inputValue()"
-                (input)="inputValue.set($any($event.target).value)"
-                [disabled]="isProcessing()"
-                [placeholder]="isProcessing() ? '生成中...' : '輸入食材名稱（如：牛肉、洋蔥、咖哩塊）'"
-                class="ingredient-input__field"
-              >
-              <button
-                type="submit"
-                [disabled]="!inputValue() || isProcessing()"
-                class="ingredient-input__btn"
-              >
-                @if (isProcessing()) {
-                  <svg class="ingredient-input__spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                  </svg>
-                  <span>生成中</span>
-                } @else {
-                  <svg class="ingredient-input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
-                  </svg>
-                  <span>新增食材</span>
-                }
-              </button>
-              <!-- 隨機食材按鈕 -->
-              <button
-                type="button"
-                class="ingredient-input__random"
-                (click)="addRandomIngredient()"
-                title="隨機新增一種食材"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                  <circle cx="12" cy="12" r="2"/>
-                  <path d="M12 6v2M12 16v2M6.93 8.5l1.73 1M15.34 14.5l1.73 1M6.93 15.5l1.73-1M15.34 9.5l1.73-1"/>
-                </svg>
-                <span>隨機食材</span>
-              </button>
-            </form>
-
-            <!-- 手牌標題 -->
-            <div class="hand-area__header">
-              <span class="hand-area__title">
-                <svg class="hand-area__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="7" height="7"/>
-                  <rect x="14" y="3" width="7" height="7"/>
-                  <rect x="14" y="14" width="7" height="7"/>
-                  <rect x="3" y="14" width="7" height="7"/>
-                </svg>
-                食材清單 ({{ hand().length }})
-              </span>
-              <span class="hand-area__hint">點擊食材加入鍋中</span>
-            </div>
-
-            <!-- 卡牌列表 -->
-            <div class="hand-cards">
-              @if (hand().length === 0 && !isProcessing()) {
-                <div class="hand-cards__empty">
-                  <svg class="hand-cards__empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                  </svg>
-                  <p>輸入食材開始探索美味食譜...</p>
-                </div>
-              }
-
-              <!-- 生成中的卡牌 -->
-              @if (isProcessing()) {
-                <div class="card-materializing">
-                  <svg class="card-materializing__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                  </svg>
-                  <span class="card-materializing__text">分析中...</span>
-                </div>
-              }
-
-              <!-- 已生成的卡牌 - 收藏卡風格 -->
-              @for (card of hand(); track card.id) {
-                <div
-                  class="collector-card"
-                  [class.collector-card--selected]="isSelected(card)"
-                  [style.--element-color]="getElementColor(card.element)"
-                  (click)="toggleSelectCard(card)"
-                >
-                  <!-- 刪除按鈕 -->
-                  <button
-                    type="button"
-                    class="collector-card__delete"
-                    (click)="removeCard(card, $event)"
-                    title="移除食材"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M18 6L6 18M6 6l12 12"/>
-                    </svg>
-                  </button>
-
-                  <!-- 卡片內容 -->
-                  <div class="collector-card__inner">
-                    <!-- 頂部：名稱 + 數量 -->
-                    <div class="collector-card__header">
-                      <div class="collector-card__title-bar" [style.background]="getElementColor(card.element)">
-                        <span class="collector-card__name">{{ card.name }}</span>
-                      </div>
-                      <div class="collector-card__count">
-                        <span class="collector-card__count-label">×</span>
-                        <span class="collector-card__count-value">1</span>
-                      </div>
-                    </div>
-
-                    <!-- 中間：食材照片 -->
-                    <div class="collector-card__image-frame">
-                      <div class="collector-card__image">
-                        @if (card.img && !hasImageError(card.id)) {
-                          <img [src]="card.img" [alt]="card.name" (error)="handleImageError(card.id)" loading="eager">
-                        } @else {
-                          <div class="collector-card__fallback">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                            </svg>
-                          </div>
-                        }
-                      </div>
-
-                      <!-- 選中標記 -->
-                      @if (isSelected(card)) {
-                        <div class="collector-card__selected-badge">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                        </div>
-                      }
-                    </div>
-
-                    <!-- 底部：元素標籤 -->
-                    <div class="collector-card__footer">
-                      <div class="collector-card__element" [style.background]="getElementColor(card.element)">
-                        <!-- 元素圖示 -->
-                        @if (card.element === '炎') {
-                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.9 0-7-3.1-7-7 0-2.8 1.6-5.2 4-6.4V6c0-1.7 1.3-3 3-3s3 1.3 3 3v3.6c2.4 1.2 4 3.6 4 6.4 0 3.9-3.1 7-7 7z"/></svg>
-                        } @else if (card.element === '水') {
-                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
-                        } @else if (card.element === '地') {
-                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        } @else if (card.element === '風') {
-                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
-                        } @else {
-                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/></svg>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
           </div>
         </div>
       }
@@ -467,14 +476,13 @@
 
       <!-- RESULT 狀態 -->
       @if (gameState() === 'RESULT') {
-        <div class="game-result">
+        <div class="game-result" [class.game-result--changing]="isChangingBatch()">
           <div class="game-result__header game-result__header--animated">
-            <svg class="game-result__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
             <h2 class="game-result__title">食譜推薦完成！</h2>
             <p class="game-result__subtitle">AI 根據您的食材，為您推薦以下食譜</p>
+            <div class="game-result__batch-indicator">
+              第 {{ currentBatch() + 1 }} / {{ totalBatches }} 批
+            </div>
           </div>
 
           <!-- 食譜卡片列表 - 收藏卡風格 -->
@@ -559,6 +567,20 @@
 
           <!-- 操作按鈕 -->
           <div class="game-result__actions">
+            @if (totalBatches > 1) {
+              <button 
+                type="button" 
+                class="btn-game btn-game--primary" 
+                (click)="nextBatch()"
+                [disabled]="isChangingBatch()"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"/>
+                  <path d="m12 5 7 7-7 7"/>
+                </svg>
+                換下一批食譜
+              </button>
+            }
             <button type="button" class="btn-game btn-game--secondary" (click)="resetGame()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/>
@@ -566,8 +588,8 @@
               </svg>
               重新選擇食材
             </button>
+          </div>
         </div>
-      </div>
       }
     </div>
   </section>
@@ -690,7 +712,16 @@
   <!-- Recipe Categories -->
   <section class="section section--gray">
     <div class="container">
-      <h2 class="section-title">推薦食譜主題</h2>
+      <div class="section-header-row">
+        <h2 class="section-title">推薦食譜主題</h2>
+        <a routerLink="/recipes/categories" class="view-all-btn">
+          <span>查看所有主題</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
       <div class="category-grid">
         @for (category of categories(); track category.id) {
           <app-category-card

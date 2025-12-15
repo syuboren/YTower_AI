@@ -17,9 +17,11 @@ export interface Recipe {
   steps: CookingStep[];
   kitchenware: Kitchenware[];
   tags: string[];
-  categories: string[];
   mealTypes: string[];
   cookingStyles: string[];
+  // 主題分類：健康飲食、快速料理、節慶主題、餐別與時段、預算與成本、
+  // 器具與空間、親子學習、便當、外帶、時令與永續、特殊需求
+  themes: string[];
 }
 
 export interface Ingredient {

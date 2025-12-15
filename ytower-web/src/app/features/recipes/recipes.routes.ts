@@ -12,11 +12,6 @@ export const recipesRoutes: Routes = [
     title: '主題分類 | 楊桃美食網'
   },
   {
-    path: 'category/:id',
-    loadComponent: () => import('./pages/recipe-list-page/recipe-list-page.component').then(m => m.RecipeListPageComponent),
-    title: '食譜分類 | 楊桃美食網'
-  },
-  {
     path: ':id',
     loadComponent: () => import('./pages/recipe-detail-page/recipe-detail-page.component').then(m => m.RecipeDetailPageComponent),
     title: '食譜詳情 | 楊桃美食網'

@@ -88,18 +88,8 @@ const RECIPE_RESULTS: RecipeCard[] = [
     element: '炎',
     gradient: 'from-yellow-500 to-amber-700',
     cookingTime: 45,
-    steps: [
-      '將牛肉切塊，洋蔥切丁，紅蘿蔔與馬鈴薯切滾刀塊',
-      '熱鍋下油，將牛肉煎至表面金黃後取出備用',
-      '原鍋炒香洋蔥至透明，加入紅蘿蔔與馬鈴薯翻炒',
-      '加入足量清水，放回牛肉，大火煮滾後轉小火燉煮 30 分鐘',
-      '加入咖哩塊攪拌至完全融化，繼續燉煮 10 分鐘至濃稠',
-      '盛上白飯，淋上咖哩即完成'
-    ],
-    missingIngredients: [
-      { name: '紅蘿蔔', purchaseUrl: 'https://shop.ytower.com.tw' },
-      { name: '馬鈴薯', purchaseUrl: 'https://shop.ytower.com.tw' }
-    ]
+    steps: ['將牛肉切塊，洋蔥切丁', '熱鍋下油煎牛肉', '加入咖哩塊燉煮', '盛上白飯即完成'],
+    missingIngredients: [{ name: '紅蘿蔔', purchaseUrl: 'https://shop.ytower.com.tw' }, { name: '馬鈴薯', purchaseUrl: 'https://shop.ytower.com.tw' }]
   },
   {
     id: 'R2',
@@ -113,13 +103,7 @@ const RECIPE_RESULTS: RecipeCard[] = [
     element: '水',
     gradient: 'from-red-400 to-orange-500',
     cookingTime: 10,
-    steps: [
-      '番茄切塊，雞蛋打散加少許鹽調味',
-      '熱鍋下油，倒入蛋液快速翻炒至八分熟後取出',
-      '原鍋再加少許油，放入番茄翻炒出汁',
-      '加入糖、鹽調味，倒回炒蛋拌勻',
-      '起鍋前撒上蔥花即完成'
-    ],
+    steps: ['番茄切塊，雞蛋打散', '熱鍋炒蛋至八分熟', '加入番茄翻炒', '調味後起鍋'],
     missingIngredients: []
   },
   {
@@ -134,18 +118,98 @@ const RECIPE_RESULTS: RecipeCard[] = [
     element: '炎',
     gradient: 'from-red-600 to-red-900',
     cookingTime: 20,
-    steps: [
-      '豆腐切丁，蔥切花，蒜與薑切末',
-      '熱鍋下油，小火爆香蒜末、薑末',
-      '加入豬絞肉炒至變色',
-      '加入豆瓣醬炒出紅油',
-      '加入高湯與豆腐，煮滾後轉小火燉煮 5 分鐘',
-      '勾芡後撒上蔥花與花椒粉即完成'
-    ],
-    missingIngredients: [
-      { name: '豆瓣醬', purchaseUrl: 'https://shop.ytower.com.tw' },
-      { name: '花椒粉', purchaseUrl: 'https://shop.ytower.com.tw' }
-    ]
+    steps: ['豆腐切丁', '爆香蒜薑', '加入豆瓣醬炒香', '加豆腐燉煮勾芡'],
+    missingIngredients: [{ name: '豆瓣醬', purchaseUrl: 'https://shop.ytower.com.tw' }, { name: '花椒粉', purchaseUrl: 'https://shop.ytower.com.tw' }]
+  },
+  {
+    id: 'R4',
+    name: '蔥爆牛肉',
+    stars: 4,
+    atk: 2500,
+    def: 1900,
+    desc: '大火快炒的蔥爆牛肉，蔥香與肉香完美結合，下飯神器。',
+    img: 'https://images.unsplash.com/photo-1551028150-64b9f398f678?auto=format&fit=crop&q=80',
+    tags: ['中式', '快炒'],
+    element: '炎',
+    gradient: 'from-amber-500 to-red-600',
+    cookingTime: 15,
+    steps: ['牛肉切片醃製', '蔥切段備用', '大火快炒牛肉', '加入蔥段翻炒'],
+    missingIngredients: []
+  },
+  {
+    id: 'R5',
+    name: '蒜香義大利麵',
+    stars: 3,
+    atk: 2100,
+    def: 1700,
+    desc: '橄欖油爆香蒜片，搭配彈牙的義大利麵，簡單卻美味的經典料理。',
+    img: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&q=80',
+    tags: ['義式', '快速'],
+    element: '風',
+    gradient: 'from-amber-300 to-yellow-600',
+    cookingTime: 20,
+    steps: ['煮義大利麵', '橄欖油爆香蒜片', '拌入煮好的麵', '調味即完成'],
+    missingIngredients: [{ name: '橄欖油', purchaseUrl: 'https://shop.ytower.com.tw' }]
+  },
+  {
+    id: 'R6',
+    name: '韓式拌飯',
+    stars: 4,
+    atk: 2400,
+    def: 2000,
+    desc: '色彩繽紛的韓式拌飯，各種蔬菜與辣醬拌在一起，營養均衡又美味。',
+    img: 'https://images.unsplash.com/photo-1553163147-622ab57be1c7?auto=format&fit=crop&q=80',
+    tags: ['韓式', '健康'],
+    element: '地',
+    gradient: 'from-orange-400 to-red-500',
+    cookingTime: 30,
+    steps: ['準備各式蔬菜', '分別炒熟調味', '白飯鋪上蔬菜', '加蛋與辣醬拌勻'],
+    missingIngredients: [{ name: '韓式辣醬', purchaseUrl: 'https://shop.ytower.com.tw' }]
+  },
+  {
+    id: 'R7',
+    name: '三杯雞',
+    stars: 5,
+    atk: 2700,
+    def: 2100,
+    desc: '台式經典三杯雞，麻油香氣撲鼻，九層塔提味，白飯殺手！',
+    img: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&q=80',
+    tags: ['台式', '經典'],
+    element: '炎',
+    gradient: 'from-amber-600 to-brown-700',
+    cookingTime: 35,
+    steps: ['雞腿切塊', '麻油爆香薑蒜', '加入雞肉煎香', '加醬油米酒燒煮'],
+    missingIngredients: [{ name: '九層塔', purchaseUrl: 'https://shop.ytower.com.tw' }]
+  },
+  {
+    id: 'R8',
+    name: '蛋花湯',
+    stars: 1,
+    atk: 1200,
+    def: 1400,
+    desc: '清淡爽口的蛋花湯，簡單易做，是家常餐桌上的常客。',
+    img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80',
+    tags: ['湯品', '清淡'],
+    element: '水',
+    gradient: 'from-yellow-200 to-amber-400',
+    cookingTime: 8,
+    steps: ['水煮滾加鹽', '蛋打散', '慢慢倒入蛋液', '撒上蔥花'],
+    missingIngredients: []
+  },
+  {
+    id: 'R9',
+    name: '宮保雞丁',
+    stars: 4,
+    atk: 2600,
+    def: 1850,
+    desc: '香辣過癮的宮保雞丁，花生酥脆雞肉嫩滑，經典川菜必學。',
+    img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80',
+    tags: ['川菜', '辣'],
+    element: '炎',
+    gradient: 'from-red-500 to-orange-600',
+    cookingTime: 25,
+    steps: ['雞胸切丁醃製', '炒香辣椒花椒', '加入雞丁快炒', '加花生翻炒'],
+    missingIngredients: [{ name: '花生', purchaseUrl: 'https://shop.ytower.com.tw' }]
   }
 ];
 
@@ -231,8 +295,12 @@ export class AiAssistantPageComponent implements OnInit {
   imageErrors = signal<Set<number>>(new Set());
 
   // 結果相關
-  recipeResults = signal<RecipeCard[]>([]);
+  allRecipeResults = signal<RecipeCard[]>([]); // 所有匹配的食譜
+  recipeResults = signal<RecipeCard[]>([]); // 當前顯示的食譜（一批3張）
   selectedRecipe = signal<RecipeCard | null>(null);
+  currentBatch = signal(0); // 當前批次
+  recipesPerBatch = 3; // 每批顯示數量
+  isChangingBatch = signal(false); // 換批次動畫狀態
 
   // 其他頁面資料
   recipes = computed(() => this.mockDataService.getRecipes().slice(0, 6));
@@ -312,6 +380,11 @@ export class AiAssistantPageComponent implements OnInit {
     };
   }
 
+  // 分析進度相關
+  analyzingText = signal('');
+  analyzedCount = signal(0);
+  totalToAnalyze = signal(0);
+
   // 新增食材到手牌
   handleAddIngredient(event?: Event): void {
     event?.preventDefault();
@@ -320,26 +393,126 @@ export class AiAssistantPageComponent implements OnInit {
 
     this.isProcessing.set(true);
     this.inputValue.set('');
+    this.analyzingText.set('正在分析文字內容...');
+    this.cdr.markForCheck();
 
     setTimeout(() => {
-      const dbKey = Object.keys(INGREDIENT_DB).find(k => value.includes(k));
-      const dbEntry = dbKey ? INGREDIENT_DB[dbKey] : this.getRandomIngredient(value);
+      // 智慧提取食材：支援文字描述或多食材輸入
+      const extractedIngredients = this.extractIngredients(value);
 
-      const newCard: IngredientCard = {
-        id: Date.now(),
-        name: value,
-        img: dbEntry.img || '',
-        type: dbEntry.type || '未知',
-        element: dbEntry.element || '光',
-        atk: dbEntry.atk || 500,
-        def: dbEntry.def || 500,
-        gradient: dbEntry.gradient || 'from-gray-400 to-gray-600'
-      };
+      if (extractedIngredients.length > 0) {
+        this.totalToAnalyze.set(extractedIngredients.length);
+        this.analyzedCount.set(0);
+        this.analyzingText.set(`發現 ${extractedIngredients.length} 項食材，開始識別...`);
+        this.cdr.markForCheck();
 
-      this.hand.update(cards => [...cards, newCard]);
-      this.isProcessing.set(false);
-      this.cdr.markForCheck();
-    }, 300);
+        // 批量新增提取到的食材（較長間隔，有分析效果）
+        const intervalTime = 800; // 每個食材間隔 800ms
+
+        extractedIngredients.forEach((ingredient, index) => {
+          setTimeout(() => {
+            this.analyzingText.set(`識別中：${ingredient}...`);
+            this.cdr.markForCheck();
+
+            // 延遲一下再新增卡片，產生「分析後出現」的效果
+            setTimeout(() => {
+              this.addIngredientCard(ingredient);
+              this.analyzedCount.set(index + 1);
+              this.cdr.markForCheck();
+            }, 400);
+          }, index * intervalTime);
+        });
+
+        // 最後一個食材新增完成後，結束處理狀態
+        setTimeout(() => {
+          this.analyzingText.set('食材識別完成！');
+          this.cdr.markForCheck();
+
+          setTimeout(() => {
+            this.isProcessing.set(false);
+            this.analyzingText.set('');
+            this.cdr.markForCheck();
+          }, 600);
+        }, extractedIngredients.length * intervalTime + 400);
+      } else {
+        // 沒有匹配到已知食材時，將整個輸入當作單一食材
+        this.analyzingText.set(`識別中：${value}...`);
+        this.cdr.markForCheck();
+
+        setTimeout(() => {
+          this.addIngredientCard(value);
+          this.analyzingText.set('食材識別完成！');
+          this.cdr.markForCheck();
+
+          setTimeout(() => {
+            this.isProcessing.set(false);
+            this.analyzingText.set('');
+            this.cdr.markForCheck();
+          }, 600);
+        }, 500);
+      }
+    }, 500);
+  }
+
+  // 智慧提取食材：從文字中識別食材名稱
+  private extractIngredients(text: string): string[] {
+    const ingredients: string[] = [];
+    const existingNames = new Set(this.hand().map(card => card.name));
+
+    // 取得所有已知食材關鍵字
+    const knownIngredients = Object.keys(INGREDIENT_DB);
+
+    // 從文字中匹配已知食材
+    for (const ingredient of knownIngredients) {
+      if (text.includes(ingredient) && !existingNames.has(ingredient)) {
+        // 避免重複添加（例如「蛋」和「雞蛋」）
+        const alreadyAdded = ingredients.some(added =>
+          added.includes(ingredient) || ingredient.includes(added)
+        );
+        if (!alreadyAdded) {
+          ingredients.push(ingredient);
+          existingNames.add(ingredient);
+        }
+      }
+    }
+
+    // 如果沒有匹配到已知食材，嘗試用分隔符號拆分
+    if (ingredients.length === 0) {
+      const separators = /[,，、\s\n]+/;
+      const parts = text.split(separators).map(p => p.trim()).filter(p => p.length > 0);
+
+      for (const part of parts) {
+        if (!existingNames.has(part)) {
+          ingredients.push(part);
+          existingNames.add(part);
+        }
+      }
+    }
+
+    return ingredients;
+  }
+
+  // 新增單一食材卡片到手牌
+  private addIngredientCard(ingredientName: string): void {
+    const existingNames = new Set(this.hand().map(card => card.name));
+    if (existingNames.has(ingredientName)) return; // 避免重複
+
+    const dbKey = Object.keys(INGREDIENT_DB).find(k => ingredientName.includes(k) || k.includes(ingredientName));
+    const dbEntry = dbKey ? INGREDIENT_DB[dbKey] : this.getRandomIngredient(ingredientName);
+
+    const newCard: IngredientCard = {
+      id: Date.now() + Math.random(), // 確保唯一 ID
+      name: ingredientName,
+      img: dbEntry.img || '',
+      type: dbEntry.type || '未知',
+      element: dbEntry.element || '光',
+      atk: dbEntry.atk || 500,
+      def: dbEntry.def || 500,
+      gradient: dbEntry.gradient || 'from-gray-400 to-gray-600'
+    };
+
+    this.hand.update(cards => [...cards, newCard]);
+    this.cdr.markForCheck();
   }
 
   private getRandomIngredient(name: string): Partial<IngredientCard> {
@@ -454,7 +627,10 @@ export class AiAssistantPageComponent implements OnInit {
             // 階段五：爆發過渡 - 閃光效果後進入結果頁面
             this.fusionPhase.set('revealing');
             const results = this.matchRecipes();
-            this.recipeResults.set(results);
+            this.allRecipeResults.set(results);
+            this.currentBatch.set(0);
+            // 顯示第一批食譜
+            this.recipeResults.set(results.slice(0, this.recipesPerBatch));
             this.cdr.detectChanges();
 
             // 爆發閃光過渡（1秒），然後進入結果頁面
@@ -474,19 +650,20 @@ export class AiAssistantPageComponent implements OnInit {
             }, 1000); // 爆發過渡時間
           }, 2500); // dissolving 階段
         }, 2000);
-      }, 2000);
+    }, 2000);
     }, 500);
   }
 
   private matchRecipes(): RecipeCard[] {
     const selectedNames = this.selectedCards().map(c => c.name);
 
+    // 返回所有食譜（9張），不再限制為 3 張
     return RECIPE_RESULTS.map(recipe => {
       const missingIngredients = recipe.missingIngredients.filter(
         mi => !selectedNames.some(name => name.includes(mi.name))
       );
       return { ...recipe, missingIngredients };
-    }).slice(0, 3);
+    });
   }
 
   // 選擇食譜查看詳情
@@ -499,13 +676,52 @@ export class AiAssistantPageComponent implements OnInit {
   }
 
   // 重置遊戲
+  // 換下一批食譜
+  nextBatch(): void {
+    const all = this.allRecipeResults();
+    const totalBatches = Math.ceil(all.length / this.recipesPerBatch);
+    const nextBatchIndex = (this.currentBatch() + 1) % totalBatches;
+
+    // 開始換批次動畫
+    this.isChangingBatch.set(true);
+    this.visibleRecipeCount.set(0);
+    this.cdr.detectChanges();
+
+    // 換批次動畫延遲
+    setTimeout(() => {
+      this.currentBatch.set(nextBatchIndex);
+      const start = nextBatchIndex * this.recipesPerBatch;
+      const end = start + this.recipesPerBatch;
+      this.recipeResults.set(all.slice(start, end));
+      this.isChangingBatch.set(false);
+      this.cdr.detectChanges();
+
+      // 逐一顯示新批次的卡片
+      const recipeCount = this.recipeResults().length;
+      for (let i = 1; i <= recipeCount; i++) {
+        setTimeout(() => {
+          this.visibleRecipeCount.set(i);
+          this.cdr.detectChanges();
+        }, i * 400);
+      }
+    }, 400);
+  }
+
+  // 計算總批次數
+  get totalBatches(): number {
+    return Math.ceil(this.allRecipeResults().length / this.recipesPerBatch);
+  }
+
   resetGame(): void {
     this.gameState.set('INPUT');
     this.selectedCards.set([]);
+    this.allRecipeResults.set([]);
     this.recipeResults.set([]);
     this.selectedRecipe.set(null);
     this.visibleCardCount.set(0);
     this.visibleRecipeCount.set(0);
+    this.currentBatch.set(0);
+    this.isChangingBatch.set(false);
     this.cdr.markForCheck();
   }
 

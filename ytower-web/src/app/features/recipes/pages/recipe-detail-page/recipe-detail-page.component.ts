@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, signal, AfterViewInit, ElementRef, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BreadcrumbComponent, RecipeCardComponent, CtaSectionComponent } from '../../../../shared/components';
 import { MockDataService } from '../../../../core/services/mock-data.service';
@@ -25,6 +25,7 @@ export class RecipeDetailPageComponent implements AfterViewInit {
   private mockDataService = inject(MockDataService);
   private elementRef = inject(ElementRef);
   private platformId = inject(PLATFORM_ID);
+  private location = inject(Location);
   
   id = input.required<string>();
 
@@ -156,5 +157,9 @@ export class RecipeDetailPageComponent implements AfterViewInit {
   getDifficultyLabel(difficulty: string | undefined): string {
     if (!difficulty) return '作法簡單';
     return this.difficultyMap[difficulty] || '作法簡單';
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

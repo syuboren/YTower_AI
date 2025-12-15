@@ -58,7 +58,7 @@ export class HeroComponent implements OnInit {
       img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80'
     },
     {
-      name: '健康料理',
+      name: '健康飲食',
       slug: 'healthy',
       img: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=400&q=80'
     },

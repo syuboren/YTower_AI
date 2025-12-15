@@ -23,9 +23,9 @@
       <div class="footer__section">
         <h4>食譜專區</h4>
         <ul>
-          <li><a routerLink="/recipes/category/healthy">健康飲食</a></li>
-          <li><a routerLink="/recipes/category/quick">快速料理</a></li>
-          <li><a routerLink="/recipes/category/festive">節慶主題</a></li>
+          <li><a routerLink="/recipes" [queryParams]="{q: '健康飲食'}">健康飲食</a></li>
+          <li><a routerLink="/recipes" [queryParams]="{q: '快速料理'}">快速料理</a></li>
+          <li><a routerLink="/recipes" [queryParams]="{q: '節慶主題'}">節慶主題</a></li>
         </ul>
       </div>
       <div class="footer__section">

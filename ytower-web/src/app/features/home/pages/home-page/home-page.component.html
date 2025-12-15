@@ -55,7 +55,7 @@
 
     <div class="themes-grid">
       @for (theme of featuredThemes; track theme.slug) {
-        <a [routerLink]="['/recipes/category', theme.slug]" class="theme-card">
+        <a [routerLink]="['/recipes']" [queryParams]="{q: theme.title}" class="theme-card">
           <div class="theme-card__image">
             <img [src]="theme.imageUrl" [alt]="theme.title" loading="lazy">
             <div class="theme-card__overlay"></div>

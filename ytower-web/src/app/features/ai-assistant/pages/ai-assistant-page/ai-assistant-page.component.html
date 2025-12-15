@@ -18,62 +18,105 @@
       @if (gameState() === 'INPUT') {
         <div class="game-input">
           <div class="game-input__layout">
-            <!-- 左側：烹飪區 -->
-            <div class="cooking-zone">
-              <!-- 鍋子 -->
-              <div class="pot-container">
-                <div class="pot">
-                  <!-- 鍋子 SVG -->
-                  <svg class="pot__svg" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- 鍋身 -->
-                    <ellipse cx="60" cy="70" rx="55" ry="8" fill="#8B7355"/>
-                    <path d="M10 30 Q10 70 60 70 Q110 70 110 30 L110 30 Q110 40 60 45 Q10 40 10 30Z" fill="url(#potGradient)"/>
-                    <ellipse cx="60" cy="30" rx="50" ry="12" fill="#C45D4A"/>
-                    <!-- 把手 -->
-                    <rect x="0" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
-                    <rect x="105" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
-                    <defs>
-                      <linearGradient id="potGradient" x1="60" y1="30" x2="60" y2="70" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#C45D4A"/>
-                        <stop offset="100%" stop-color="#8B4513"/>
-                      </linearGradient>
-                    </defs>
-                  </svg>
+            <!-- 左側：五芒星魔法陣 -->
+            <div class="pentagram-zone">
+              <div class="pentagram-container">
+                <!-- 五芒星 SVG 底圖 -->
+                <svg class="pentagram-svg" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- 外圈光暈 -->
+                  <circle cx="150" cy="150" r="140" stroke="url(#pentagramGlow)" stroke-width="2" fill="none" opacity="0.3"/>
+                  <circle cx="150" cy="150" r="130" stroke="url(#pentagramGlow)" stroke-width="1" fill="none" opacity="0.2"/>
 
-                  <!-- 選中的食材圖示（會跳入鍋中） -->
-                  @for (card of selectedCards(); track card.id; let idx = $index) {
-                    <div
-                      class="ingredient-icon"
-                      [style.left]="getCardPosition(idx, selectedCards().length).left"
-                      [style.top]="getCardPosition(idx, selectedCards().length).top"
-                    >
-                      <!-- 食材圖示 SVG -->
-                      <svg class="ingredient-icon__svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="20" r="18" [attr.fill]="getElementColor(card.element)" fill-opacity="0.2"/>
-                        <circle cx="20" cy="20" r="14" [attr.fill]="getElementColor(card.element)"/>
-                        <text x="20" y="25" text-anchor="middle" fill="white" font-size="12" font-weight="bold">{{ card.name.charAt(0) }}</text>
-                      </svg>
-                      <span class="ingredient-icon__name">{{ card.name }}</span>
-                    </div>
-                  }
-                </div>
+                  <!-- 五芒星線條（基礎層 - 帶繪製動畫） -->
+                  <path
+                    class="pentagram-path"
+                    [class.pentagram-path--drawn]="pentagramDrawn()"
+                    [attr.d]="getPentagramPath()"
+                    stroke="url(#pentagramGradient)"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+
+                  <!-- 五芒星光點流動層（白色光暈 - 疊加在基礎層上方） -->
+                  <path
+                    class="pentagram-glow"
+                    [class.pentagram-glow--active]="pentagramDrawn()"
+                    [attr.d]="getPentagramPath()"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+
+                  <!-- 中心圓 -->
+                  <circle cx="150" cy="150" r="25" fill="url(#centerGlow)" opacity="0.5"/>
+
+                  <defs>
+                    <linearGradient id="pentagramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#F58220"/>
+                      <stop offset="50%" stop-color="#C45D4A"/>
+                      <stop offset="100%" stop-color="#F58220"/>
+                    </linearGradient>
+                    <radialGradient id="pentagramGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#F58220"/>
+                      <stop offset="100%" stop-color="#C45D4A"/>
+                    </radialGradient>
+                    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#fff"/>
+                      <stop offset="100%" stop-color="#F58220"/>
+                    </radialGradient>
+                  </defs>
+                </svg>
+
+                <!-- 5個空白卡槽 -->
+                @for (point of pentagramPoints; track $index; let idx = $index) {
+                  <div
+                    class="card-slot"
+                    [style.left.%]="point.x"
+                    [style.top.%]="point.y"
+                  >
+                    <!-- 空卡槽 -->
+                    @if (idx >= selectedCards().length) {
+                      <div class="card-slot__empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4">
+                          <rect x="3" y="3" width="18" height="18" rx="3"/>
+                          <path d="M12 8v8M8 12h8"/>
+                        </svg>
+                      </div>
+                    } @else {
+                      <!-- 已填入的食材卡 -->
+                      <div class="card-slot__filled" [@slotFillIn]>
+                        <div
+                          class="slot-card"
+                          [style.background]="'linear-gradient(135deg, ' + getElementColor(selectedCards()[idx].element) + '99, ' + getElementColor(selectedCards()[idx].element) + ')'"
+                        >
+                          <span class="slot-card__name">{{ selectedCards()[idx].name.charAt(0) }}</span>
+                          <span class="slot-card__element">{{ selectedCards()[idx].element }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
 
                 <!-- 中心操作區 -->
-                <div class="pot-action">
+                <div class="pentagram-action">
                   @if (selectedCards().length >= 2) {
-                    <button type="button" class="cook-btn" (click)="startFusion()">
-                      <!-- 火焰 Icon -->
-                      <svg class="cook-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                    <button type="button" class="fusion-btn" (click)="startFusion()">
+                      <svg class="fusion-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
                       </svg>
-                      <span class="cook-btn__text">開始烹飪</span>
+                      <span>開始融合</span>
                     </button>
                   } @else {
-                    <div class="pot-hint">
-                      <p class="pot-hint__text">選擇 2-3 種食材</p>
-                      <div class="pot-hint__dots">
-                        @for (i of [0, 1, 2]; track i) {
-                          <span class="pot-hint__dot" [class.pot-hint__dot--active]="i < selectedCards().length"></span>
+                    <div class="pentagram-hint">
+                      <p>選擇 2-5 種食材</p>
+                      <div class="pentagram-hint__dots">
+                        @for (i of [0, 1, 2, 3, 4]; track i) {
+                          <span
+                            class="pentagram-hint__dot"
+                            [class.pentagram-hint__dot--active]="i < selectedCards().length"
+                          ></span>
                         }
                       </div>
                     </div>
@@ -132,6 +175,20 @@
                   <span>新增食材</span>
                 }
               </button>
+              <!-- 隨機食材按鈕 -->
+              <button
+                type="button"
+                class="ingredient-input__random"
+                (click)="addRandomIngredient()"
+                title="隨機新增一種食材"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  <circle cx="12" cy="12" r="2"/>
+                  <path d="M12 6v2M12 16v2M6.93 8.5l1.73 1M15.34 14.5l1.73 1M6.93 15.5l1.73-1M15.34 9.5l1.73-1"/>
+                </svg>
+                <span>隨機食材</span>
+              </button>
             </form>
 
             <!-- 手牌標題 -->
@@ -169,45 +226,80 @@
                 </div>
               }
 
-              <!-- 已生成的卡牌 -->
+              <!-- 已生成的卡牌 - 收藏卡風格 -->
               @for (card of hand(); track card.id) {
                 <div
-                  class="ingredient-card"
-                  [class.ingredient-card--selected]="isSelected(card)"
+                  class="collector-card"
+                  [class.collector-card--selected]="isSelected(card)"
+                  [style.--element-color]="getElementColor(card.element)"
                   (click)="toggleSelectCard(card)"
                 >
-                  <!-- 卡片頭部 -->
-                  <div class="ingredient-card__header">
-                    <span class="ingredient-card__name">{{ card.name }}</span>
-                    <span class="ingredient-card__element" [style.background]="getElementColor(card.element)">
-                      {{ card.element }}
-                    </span>
-                  </div>
+                  <!-- 刪除按鈕 -->
+                  <button
+                    type="button"
+                    class="collector-card__delete"
+                    (click)="removeCard(card, $event)"
+                    title="移除食材"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                  </button>
 
-                  <!-- 卡圖 -->
-                  <div class="ingredient-card__image">
-                    @if (card.img && !hasImageError(card.id)) {
-                      <img [src]="card.img" [alt]="card.name" (error)="handleImageError(card.id)" loading="eager">
-                    } @else {
-                      <div class="ingredient-card__fallback" [style.background]="'linear-gradient(135deg, ' + getElementColor(card.element) + '33, ' + getElementColor(card.element) + '66)'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        </svg>
+                  <!-- 卡片內容 -->
+                  <div class="collector-card__inner">
+                    <!-- 頂部：名稱 + 數量 -->
+                    <div class="collector-card__header">
+                      <div class="collector-card__title-bar" [style.background]="getElementColor(card.element)">
+                        <span class="collector-card__name">{{ card.name }}</span>
                       </div>
-                    }
-                    <!-- 選中標記 -->
-                    @if (isSelected(card)) {
-                      <div class="ingredient-card__check">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
+                      <div class="collector-card__count">
+                        <span class="collector-card__count-label">×</span>
+                        <span class="collector-card__count-value">1</span>
                       </div>
-                    }
-                  </div>
+                    </div>
 
-                  <!-- 卡片底部 -->
-                  <div class="ingredient-card__footer">
-                    <span class="ingredient-card__type">[{{ card.type }}]</span>
+                    <!-- 中間：食材照片 -->
+                    <div class="collector-card__image-frame">
+                      <div class="collector-card__image">
+                        @if (card.img && !hasImageError(card.id)) {
+                          <img [src]="card.img" [alt]="card.name" (error)="handleImageError(card.id)" loading="eager">
+                        } @else {
+                          <div class="collector-card__fallback">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            </svg>
+                          </div>
+                        }
+                      </div>
+
+                      <!-- 選中標記 -->
+                      @if (isSelected(card)) {
+                        <div class="collector-card__selected-badge">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- 底部：元素標籤 -->
+                    <div class="collector-card__footer">
+                      <div class="collector-card__element" [style.background]="getElementColor(card.element)">
+                        <!-- 元素圖示 -->
+                        @if (card.element === '炎') {
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.9 0-7-3.1-7-7 0-2.8 1.6-5.2 4-6.4V6c0-1.7 1.3-3 3-3s3 1.3 3 3v3.6c2.4 1.2 4 3.6 4 6.4 0 3.9-3.1 7-7 7z"/></svg>
+                        } @else if (card.element === '水') {
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
+                        } @else if (card.element === '地') {
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        } @else if (card.element === '風') {
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                        } @else {
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/></svg>
+                        }
+                      </div>
+                    </div>
                   </div>
                 </div>
               }
@@ -216,82 +308,159 @@
         </div>
       }
 
-      <!-- FUSING 狀態（鍋子動畫） -->
+      <!-- FUSING 狀態（五芒星融合動畫 - 5階段） -->
       @if (gameState() === 'FUSING') {
-        <div class="game-fusing">
-          <div class="cooking-animation">
-            <!-- 鍋子 -->
-            <div class="cooking-pot">
-              <!-- 鍋蓋 -->
-              <div class="cooking-pot__lid" [class.cooking-pot__lid--closed]="lidState() === 'closed'">
-                <svg viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <ellipse cx="50" cy="25" rx="45" ry="5" fill="#6B5344"/>
-                  <path d="M10 25 Q50 0 90 25" fill="#8B7355"/>
-                  <circle cx="50" cy="8" r="6" fill="#6B5344"/>
-                </svg>
+        <div class="game-fusing"
+             [class.game-fusing--ready]="fusionPhase() === 'ready'"
+             [class.game-fusing--summoning]="fusionPhase() === 'summoning'"
+             [class.game-fusing--tracing]="fusionPhase() === 'tracing'"
+             [class.game-fusing--dissolving]="fusionPhase() === 'dissolving'"
+             [class.game-fusing--revealing]="fusionPhase() === 'revealing'">
+
+          <div class="fusion-stage">
+            <!-- 五芒星 SVG -->
+            <svg class="fusion-pentagram" viewBox="0 0 300 300" fill="none">
+              <!-- 外圈 -->
+              <circle cx="150" cy="150" r="140"
+                      stroke="url(#fusionGlow)"
+                      stroke-width="2"
+                      fill="none"
+                      class="fusion-pentagram__circle"
+                      [class.fusion-pentagram__circle--shimmer]="fusionPhase() === 'ready' || fusionPhase() === 'tracing'"/>
+
+              <!-- 五芒星線條 -->
+              <path
+                class="fusion-pentagram__star"
+                [class.fusion-pentagram__star--shimmer]="fusionPhase() === 'ready'"
+                [class.fusion-pentagram__star--trace]="fusionPhase() === 'tracing'"
+                [attr.d]="getPentagramPath()"
+                stroke="url(#fusionGradient)"
+                stroke-width="4"
+                fill="none"
+              />
+
+              <!-- 微粒效果（描繪階段） -->
+              @if (fusionPhase() === 'tracing') {
+                <circle class="fusion-particle fusion-particle--1" cx="150" cy="30" r="4" fill="#F58220"/>
+                <circle class="fusion-particle fusion-particle--2" cx="260" cy="110" r="3" fill="#fff"/>
+                <circle class="fusion-particle fusion-particle--3" cx="220" cy="250" r="4" fill="#C45D4A"/>
+                <circle class="fusion-particle fusion-particle--4" cx="80" cy="250" r="3" fill="#F58220"/>
+                <circle class="fusion-particle fusion-particle--5" cx="40" cy="110" r="4" fill="#fff"/>
+              }
+
+              <!-- 中心 Logo -->
+              <image
+                href="assets/images/logo.png"
+                x="110" y="110"
+                width="80" height="80"
+                class="fusion-pentagram__logo"
+                [class.fusion-pentagram__logo--pulse]="fusionPhase() === 'dissolving'"
+              />
+
+              <defs>
+                <linearGradient id="fusionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F58220"/>
+                  <stop offset="50%" stop-color="#fff"/>
+                  <stop offset="100%" stop-color="#C45D4A"/>
+                </linearGradient>
+                <radialGradient id="fusionGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#F58220"/>
+                  <stop offset="100%" stop-color="#C45D4A"/>
+                </radialGradient>
+                <radialGradient id="fusionCenter" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#fff"/>
+                  <stop offset="50%" stop-color="#F58220"/>
+                  <stop offset="100%" stop-color="#C45D4A"/>
+                </radialGradient>
+              </defs>
+            </svg>
+
+            <!-- 卡槽與卡片 -->
+            @for (point of pentagramPoints; track $index; let idx = $index) {
+              <div class="fusion-slot"
+                   [style.left.%]="point.x"
+                   [style.top.%]="point.y">
+
+                <!-- 空白卡槽（準備階段） -->
+                @if (fusionPhase() === 'ready' || (fusionPhase() === 'summoning' && idx >= visibleCardCount())) {
+                  <div class="fusion-slot__empty"
+                       [class.fusion-slot__empty--shimmer]="fusionPhase() === 'ready'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <rect x="3" y="3" width="18" height="18" rx="3"/>
+                    </svg>
+                  </div>
+                }
+
+                <!-- 食材卡片（召喚階段開始顯示） -->
+                @if (idx < selectedCards().length && idx < visibleCardCount()) {
+                  <div class="fusion-card"
+                       [class.fusion-card--appear]="fusionPhase() === 'summoning'"
+                       [class.fusion-card--dissolve]="fusionPhase() === 'dissolving'"
+                       [style.--element-color]="getElementColor(selectedCards()[idx].element)"
+                       [style.animation-delay.ms]="idx * 100">
+
+                    <!-- 卡片內容 -->
+                    <div class="fusion-card__inner">
+                      <div class="fusion-card__header" [style.background]="getElementColor(selectedCards()[idx].element)">
+                        <span>{{ selectedCards()[idx].name }}</span>
+                      </div>
+                      <div class="fusion-card__image">
+                        <img [src]="selectedCards()[idx].img" [alt]="selectedCards()[idx].name">
+                      </div>
+                      <div class="fusion-card__element" [style.background]="getElementColor(selectedCards()[idx].element)">
+                        {{ selectedCards()[idx].element }}
+                      </div>
+                    </div>
+
+                    <!-- 分解粒子（融合階段） -->
+                    @if (fusionPhase() === 'dissolving') {
+                      <div class="fusion-card__particles" [style.--element-color]="getElementColor(selectedCards()[idx].element)">
+                        @for (p of [1,2,3,4,5,6,7,8]; track p) {
+                          <span class="fusion-card__particle" [style.--i]="p"></span>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
               </div>
+            }
 
-              <!-- 鍋身 -->
-              <svg class="cooking-pot__body" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <ellipse cx="60" cy="70" rx="55" ry="8" fill="#8B7355"/>
-                <path d="M10 30 Q10 70 60 70 Q110 70 110 30 L110 30 Q110 40 60 45 Q10 40 10 30Z" fill="url(#potGradient2)"/>
-                <ellipse cx="60" cy="30" rx="50" ry="12" fill="#C45D4A"/>
-                <rect x="0" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
-                <rect x="105" y="25" width="15" height="10" rx="3" fill="#8B7355"/>
-                <defs>
-                  <linearGradient id="potGradient2" x1="60" y1="30" x2="60" y2="70" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#C45D4A"/>
-                    <stop offset="100%" stop-color="#8B4513"/>
-                  </linearGradient>
-                </defs>
-              </svg>
+            <!-- 揭曉階段：爆發過渡效果 -->
+            @if (fusionPhase() === 'revealing') {
+              <div class="fusion-burst">
+                <div class="fusion-burst__flash"></div>
+                <div class="fusion-burst__ring fusion-burst__ring--1"></div>
+                <div class="fusion-burst__ring fusion-burst__ring--2"></div>
+                <div class="fusion-burst__ring fusion-burst__ring--3"></div>
+                <img src="assets/images/logo.png" alt="楊桃美食網" class="fusion-burst__logo">
+                <h2 class="fusion-burst__text">融合完成！</h2>
+              </div>
+            }
+          </div>
 
-              <!-- 跳入的食材 -->
-              @for (card of selectedCards(); track card.id; let idx = $index) {
-                <div
-                  class="jumping-ingredient"
-                  [class.jumping-ingredient--jumped]="idx < jumpingIngredientIndex()"
-                  [style.animation-delay]="idx * 0.6 + 's'"
-                >
-                  <svg viewBox="0 0 40 40" fill="none">
-                    <circle cx="20" cy="20" r="16" [attr.fill]="getElementColor(card.element)"/>
-                    <text x="20" y="25" text-anchor="middle" fill="white" font-size="14" font-weight="bold">{{ card.name.charAt(0) }}</text>
-                  </svg>
-                </div>
-              }
-
-              <!-- 蒸氣 -->
-              @if (showSteam()) {
-                <div class="steam-container">
-                  <div class="steam steam--1">
-                    <svg viewBox="0 0 20 30" fill="none">
-                      <path d="M10 30 Q5 20 10 15 Q15 10 10 0" stroke="#999" stroke-width="2" fill="none" opacity="0.6"/>
-                    </svg>
-                  </div>
-                  <div class="steam steam--2">
-                    <svg viewBox="0 0 20 30" fill="none">
-                      <path d="M10 30 Q15 20 10 15 Q5 10 10 0" stroke="#999" stroke-width="2" fill="none" opacity="0.6"/>
-                    </svg>
-                  </div>
-                  <div class="steam steam--3">
-                    <svg viewBox="0 0 20 30" fill="none">
-                      <path d="M10 30 Q5 20 10 15 Q15 10 10 0" stroke="#999" stroke-width="2" fill="none" opacity="0.6"/>
-                    </svg>
-                  </div>
-                </div>
-              }
-            </div>
-
-            <h2 class="cooking-animation__title">
-              @if (cookingPhase() === 'jumping') {
-                食材準備中...
-              } @else if (cookingPhase() === 'cooking') {
-                AI 正在分析食譜...
+          <!-- 階段文字提示 -->
+          <div class="fusion-status">
+            <h2 class="fusion-status__title">
+              @if (fusionPhase() === 'ready') {
+                魔法陣準備中...
+              } @else if (fusionPhase() === 'summoning') {
+                召喚食材中...
+              } @else if (fusionPhase() === 'tracing') {
+                描繪魔法陣...
+              } @else if (fusionPhase() === 'dissolving') {
+                食材融合中...
               } @else {
-                即將完成！
+                食譜誕生！
               }
             </h2>
-            <p class="cooking-animation__subtitle">請稍候，美味即將呈現</p>
+            <div class="fusion-status__progress">
+              <div class="fusion-status__bar"
+                   [style.width.%]="fusionPhase() === 'ready' ? 10 :
+                                    fusionPhase() === 'summoning' ? 30 :
+                                    fusionPhase() === 'tracing' ? 60 :
+                                    fusionPhase() === 'dissolving' ? 85 : 100">
+              </div>
+            </div>
           </div>
         </div>
       }
@@ -299,7 +468,7 @@
       <!-- RESULT 狀態 -->
       @if (gameState() === 'RESULT') {
         <div class="game-result">
-          <div class="game-result__header">
+          <div class="game-result__header game-result__header--animated">
             <svg class="game-result__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
               <polyline points="22 4 12 14.01 9 11.01"/>
@@ -308,62 +477,83 @@
             <p class="game-result__subtitle">AI 根據您的食材，為您推薦以下食譜</p>
           </div>
 
-          <!-- 食譜卡片列表 -->
-          <div class="recipe-cards">
-            @for (recipe of recipeResults(); track recipe.id) {
-              <div class="recipe-card-game" (click)="selectRecipe(recipe)">
-                <!-- 星級 -->
-                <div class="recipe-card-game__stars">
-                  @for (star of [].constructor(recipe.stars); track $index) {
-                    <svg class="recipe-card-game__star" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  }
-                </div>
+          <!-- 食譜卡片列表 - 收藏卡風格 -->
+          <div class="recipe-collector-cards">
+            @for (recipe of recipeResults(); track recipe.id; let idx = $index) {
+              @if (idx < visibleRecipeCount()) {
+                <div
+                  class="recipe-collector"
+                  [class.recipe-collector--legendary]="recipe.stars >= 5"
+                  [class.recipe-collector--rare]="recipe.stars >= 3 && recipe.stars < 5"
+                  [class.recipe-collector--common]="recipe.stars < 3"
+                  [style.animation-delay]="idx * 0.2 + 's'"
+                  (click)="selectRecipe(recipe)"
+                >
+                  <!-- 光澤效果層 -->
+                  <div class="recipe-collector__glow"></div>
 
-                <!-- 卡圖 -->
-                <div class="recipe-card-game__image">
-                  <img [src]="recipe.img" [alt]="recipe.name">
-                  <div class="recipe-card-game__overlay"></div>
-                </div>
+                  <!-- 卡片內容 -->
+                  <div class="recipe-collector__inner">
+                    <!-- 頂部：名稱 + 星級 -->
+                    <div class="recipe-collector__header">
+                      <div class="recipe-collector__title-bar">
+                        <span class="recipe-collector__name">{{ recipe.name }}</span>
+                      </div>
+                      <div class="recipe-collector__stars">
+                        @for (star of [].constructor(recipe.stars); track $index) {
+                          <span class="recipe-collector__star">★</span>
+                        }
+                      </div>
+                    </div>
 
-                <!-- 卡片資訊 -->
-                <div class="recipe-card-game__info">
-                  <h3 class="recipe-card-game__name">{{ recipe.name }}</h3>
-                  <p class="recipe-card-game__desc">{{ recipe.desc }}</p>
-                  <div class="recipe-card-game__tags">
-                    @for (tag of recipe.tags; track tag) {
-                      <span class="recipe-card-game__tag">#{{ tag }}</span>
-                    }
+                    <!-- 圖片區域 -->
+                    <div class="recipe-collector__image-frame">
+                      <img [src]="recipe.img" [alt]="recipe.name" loading="lazy">
+                      <div class="recipe-collector__shine"></div>
+                    </div>
+
+                    <!-- 資訊區域 -->
+                    <div class="recipe-collector__info">
+                      <p class="recipe-collector__desc">{{ recipe.desc }}</p>
+
+                      <!-- 標籤 -->
+                      <div class="recipe-collector__tags">
+                        @for (tag of recipe.tags; track tag) {
+                          <span class="recipe-collector__tag">#{{ tag }}</span>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- 底部：烹調時間 -->
+                    <div class="recipe-collector__footer">
+                      <div class="recipe-collector__time">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span>{{ recipe.cookingTime }} 分鐘</span>
+                      </div>
+                    </div>
                   </div>
-                  <div class="recipe-card-game__meta">
-                    <span class="recipe-card-game__time">
+
+                  <!-- 缺少食材提示 -->
+                  @if (recipe.missingIngredients.length > 0) {
+                    <div class="recipe-collector__missing">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
                       </svg>
-                      {{ recipe.cookingTime }} 分鐘
-                    </span>
-                  </div>
+                      <span>缺少：</span>
+                      @for (mi of recipe.missingIngredients; track mi.name) {
+                        <a [href]="mi.purchaseUrl" target="_blank" class="recipe-collector__missing-link" (click)="$event.stopPropagation()">
+                          {{ mi.name }}
+                        </a>
+                      }
+                    </div>
+                  }
                 </div>
-
-                <!-- 缺少食材提示 -->
-                @if (recipe.missingIngredients.length > 0) {
-                  <div class="recipe-card-game__missing">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="8" x2="12" y2="12"/>
-                      <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    <span>缺少：</span>
-                    @for (mi of recipe.missingIngredients; track mi.name) {
-                      <a [href]="mi.purchaseUrl" target="_blank" class="missing-ingredient">
-                        {{ mi.name }}
-                      </a>
-                    }
-                  </div>
-                }
-              </div>
+              }
             }
           </div>
 

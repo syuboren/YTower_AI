@@ -1,6 +1,14 @@
 .hero {
-  @apply relative w-full min-h-screen bg-[#f8f9fa] flex items-center justify-center overflow-hidden;
+  @apply relative w-full bg-[#f8f9fa] flex items-center justify-center overflow-hidden;
   font-family: 'Noto Sans TC', sans-serif;
+  min-height: auto;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+
+  @media (min-width: 1024px) {
+    min-height: 100vh;
+    overflow: visible;
+  }
 
   // Background Decoration
   &__bg-decor {
@@ -22,12 +30,27 @@
 
   // Container
   &__container {
-    @apply relative z-10 w-full max-w-7xl px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-20;
+    @apply relative z-10 w-full max-w-7xl px-6 flex flex-col items-center;
+    gap: 2rem;
+
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      gap: 5rem;
+    }
   }
 
   // Left Section
   &__left {
-    @apply flex-1 text-left z-20 flex flex-col justify-center h-full pt-10 lg:pt-0;
+    @apply text-left z-20 flex flex-col justify-center;
+    width: 100%;
+    order: 1; // 手機版時放在上方
+    padding-top: 1rem;
+
+    @media (min-width: 1024px) {
+      flex: 1;
+      order: 0; // 桌面版恢復原順序
+      padding-top: 0;
+    }
   }
 
   // Brand
@@ -116,13 +139,37 @@
 
   // Right Section (Card Stack)
   &__right {
-    @apply flex-1 h-[600px] w-full flex items-center justify-center relative;
+    @apply w-full flex items-center justify-center relative;
+    height: 420px;
     perspective: 1200px;
+    order: 2; // 手機版時放在下方
+    
+    @media (min-width: 768px) {
+      height: 500px;
+    }
+    
+    @media (min-width: 1024px) {
+      flex: 1;
+      height: 600px;
+      order: 0; // 桌面版恢復原順序
+    }
   }
 
   // Plate
   &__plate {
-    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] z-0 pointer-events-none flex items-center justify-center;
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none flex items-center justify-center;
+    width: 400px;
+    height: 400px;
+
+    @media (min-width: 768px) {
+      width: 500px;
+      height: 500px;
+    }
+    
+    @media (min-width: 1024px) {
+      width: 600px;
+      height: 600px;
+    }
   }
 
   &__plate-svg {
@@ -131,9 +178,20 @@
 
   // Card
   &__card {
-    @apply absolute w-72 md:w-80 bg-white rounded-3xl shadow-xl p-4 border border-gray-100;
-    height: 420px;
+    @apply absolute bg-white rounded-3xl shadow-xl p-4 border border-gray-100;
+    width: 260px;
+    height: 360px;
     transition: all 0.5s ease-out;
+
+    @media (min-width: 768px) {
+      width: 300px;
+      height: 400px;
+    }
+    
+    @media (min-width: 1024px) {
+      width: 320px;
+      height: 420px;
+    }
 
     &:hover {
       z-index: 50 !important;
@@ -141,7 +199,17 @@
   }
 
   &__card-image {
-    @apply w-full h-52 rounded-2xl overflow-hidden mb-5 relative bg-gray-100 z-10;
+    @apply w-full rounded-2xl overflow-hidden mb-4 relative bg-gray-100 z-10;
+    height: 160px;
+
+    @media (min-width: 768px) {
+      height: 180px;
+      margin-bottom: 1.25rem;
+    }
+    
+    @media (min-width: 1024px) {
+      height: 208px;
+    }
 
     img {
       @apply w-full h-full object-cover;

@@ -64,7 +64,7 @@
     grid-template-columns: 1fr;
     gap: 2rem;
     align-items: center;
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 
     @media (min-width: 992px) {
       grid-template-columns: 1fr 1fr;
@@ -137,101 +137,271 @@
 }
 
 // ============================================
-// Cooking Zone（鍋子區域）
+// Pentagram Zone（五芒星區域）
 // ============================================
-.cooking-zone {
+.pentagram-zone {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.pot-container {
-  position: relative;
-  width: 280px;
-  height: 250px;
-
-  @media (min-width: 768px) {
-    width: 320px;
-    height: 280px;
-  }
-}
-
-.pot {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
   align-items: center;
   justify-content: center;
+}
 
-  &__svg {
-    width: 200px;
-    height: auto;
+.pentagram-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
 
-    @media (min-width: 768px) {
-      width: 240px;
-    }
+  @media (min-width: 768px) {
+    width: 340px;
+    height: 340px;
   }
 }
 
-.ingredient-icon {
+.pentagram-svg {
   position: absolute;
+  top: 0;
+  left: 0;
+      width: 100%;
+      height: 100%;
+}
+
+// 五芒星線條繪製動畫
+// 注意：五芒星路徑總長度約 1150px（5條線段 × 230px），需要足夠長的 dasharray
+.pentagram-path {
+  stroke-dasharray: 1500;
+  stroke-dashoffset: 1500;
+  transition: stroke-dashoffset 2s ease-out;
+  filter: drop-shadow(0 0 3px rgba(245, 130, 32, 0.5));
+
+  &--drawn {
+    stroke-dashoffset: 0;
+  }
+}
+
+// 五芒星光點流動層（疊加在基礎線條上方）
+.pentagram-glow {
+  stroke-dasharray: 40 1460; // 短光點 + 長空白（總長 1500）
+  stroke-dashoffset: 0;
+  stroke: #fff;
+  stroke-width: 4;
+  opacity: 0;
+  filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+  animation: pentagramGlowFlow 3s linear infinite;
+
+  &--active {
+    opacity: 1;
+  }
+}
+
+// 白色光點沿五芒星流動動畫
+@keyframes pentagramGlowFlow {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -1500;
+    opacity: 0.9;
+  }
+}
+
+// 卡槽樣式
+.card-slot {
+  position: absolute;
+  width: 70px;
+  height: 90px;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  z-index: 2;
+
+  &__empty {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, 
+      rgba(255, 255, 255, 0.6) 0%, 
+      rgba(240, 240, 240, 0.4) 100%
+    );
+    backdrop-filter: blur(8px);
+    border: 2px dashed rgba(245, 130, 32, 0.4);
+    box-shadow: 
+      inset 0 2px 4px rgba(0, 0, 0, 0.05),
+      0 4px 12px rgba(0, 0, 0, 0.08);
+
+    svg {
+      width: 28px;
+      height: 28px;
+      color: rgba(245, 130, 32, 0.3);
+    }
+  }
+
+  &__filled {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.slot-card {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  animation: float 3s ease-in-out infinite;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
 
-  &__svg {
-    width: 48px;
-    height: 48px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  // 光澤邊框
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 2px;
+    background: linear-gradient(145deg, 
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.8) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
   }
+
+  // 光暈動畫
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 14px;
+    background: inherit;
+    filter: blur(8px);
+    opacity: 0.5;
+    z-index: -1;
+    animation: slotGlow 2s ease-in-out infinite;
+  }
+
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    0 0 20px rgba(245, 130, 32, 0.3);
 
   &__name {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #333;
-    background: #fff;
-    padding: 2px 8px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 0 10px rgba(255, 255, 255, 0.3);
+  }
+
+  &__element {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 3px 10px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
   }
 }
 
-.pot-action {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+@keyframes cardGlow {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(245, 130, 32, 0.4);
+  }
 }
 
-.pot-hint {
-  text-align: center;
+// 中心操作區
+.pentagram-action {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
 
-  &__text {
+.fusion-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(245, 130, 32, 0.4);
+  animation: pulseGlow 2s ease-in-out infinite;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(245, 130, 32, 0.5);
+  }
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  span {
     font-size: 0.875rem;
-    color: #999;
+    font-weight: 600;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(245, 130, 32, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 40px rgba(245, 130, 32, 0.6);
+  }
+}
+
+.pentagram-hint {
+    text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+  p {
+    font-size: 0.875rem;
+    color: #666;
     margin-bottom: 0.5rem;
   }
 
   &__dots {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
   }
 
   &__dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #e5e5e5;
     transition: all 0.3s;
 
     &--active {
       background: #F58220;
-      box-shadow: 0 0 8px rgba(245, 130, 32, 0.4);
+      box-shadow: 0 0 8px rgba(245, 130, 32, 0.5);
     }
   }
 }
@@ -245,7 +415,7 @@
   background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
   border: none;
   border-radius: 16px;
-  color: #fff;
+    color: #fff;
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 4px 20px rgba(245, 130, 32, 0.3);
@@ -377,6 +547,83 @@
     height: 18px;
     animation: spin 1s linear infinite;
   }
+
+  // 隨機食材按鈕
+  &__random {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      animation: diceRoll 3s ease-in-out infinite;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+
+      &::before {
+        left: 100%;
+      }
+
+      svg {
+        animation: diceRollFast 0.3s ease-in-out infinite;
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// 骰子旋轉動畫
+@keyframes diceRoll {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes diceRollFast {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 // ============================================
@@ -384,9 +631,10 @@
 // ============================================
 .hand-cards {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   overflow-x: auto;
-  padding: 0.5rem 0 1rem;
+  padding: 1rem 0 1.5rem;
+  perspective: 1000px;
 
   &::-webkit-scrollbar {
     height: 6px;
@@ -454,103 +702,79 @@
 }
 
 // ============================================
-// Ingredient Card（淺色模式）
+// Collector Card（收藏卡風格）
 // ============================================
-.ingredient-card {
+.collector-card {
+  --element-color: #F58220;
+  
+  position: relative;
   flex-shrink: 0;
-  width: 140px;
-  background: #fff;
-  border: 2px solid #e5e5e5;
-  border-radius: 12px;
-  overflow: hidden;
+  width: 180px;
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+
+  // 光澤邊框 - 未選擇狀態
+  border: 3px solid transparent;
+  background: 
+    linear-gradient(145deg, #fafafa 0%, #f0f0f0 100%) padding-box,
+    linear-gradient(145deg, 
+      #d4d4d4 0%,
+      #fff 25%,
+      #b8b8b8 50%,
+      #fff 75%,
+      #d4d4d4 100%
+    ) border-box;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    transform: translateY(-4px);
-    border-color: #ccc;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    
+    .collector-card__delete {
+      opacity: 1;
+    }
   }
 
   &--selected {
-    border-color: #F58220;
-    box-shadow: 0 4px 20px rgba(245, 130, 32, 0.2);
-
-    &:hover {
-      border-color: #F58220;
-    }
+    // 選中時彩色邊框 + 流動動畫
+    background: 
+      linear-gradient(145deg, #fafafa 0%, #f0f0f0 100%) padding-box,
+      linear-gradient(90deg, 
+        var(--element-color) 0%,
+        #fff 25%,
+        var(--element-color) 50%,
+        #fff 75%,
+        var(--element-color) 100%
+      ) border-box;
+    background-size: 100% 100%, 300% 100%;
+    box-shadow: 0 6px 20px rgba(245, 130, 32, 0.25);
+    animation: cardBorderShine 2s linear infinite;
   }
 
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    background: #f9f9f9;
-    border-bottom: 1px solid #e5e5e5;
-  }
-
-  &__name {
-    color: #333;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 80px;
-  }
-
-  &__element {
-    font-size: 0.625rem;
-    font-weight: 700;
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 10px;
-  }
-
-  &__image {
-    position: relative;
-    height: 90px;
-    background: #f5f5f5;
-    overflow: hidden;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s;
-    }
-
-    &:hover img {
-      transform: scale(1.05);
-    }
-  }
-
-  &__fallback {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-      width: 32px;
-      height: 32px;
-      opacity: 0.5;
-    }
-  }
-
-  &__check {
+  // 刪除按鈕
+  &__delete {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: -8px;
+    right: -8px;
     width: 24px;
     height: 24px;
-    background: #F58220;
     border-radius: 50%;
+    background: #ef4444;
+    border: 2px solid #fff;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      background: #dc2626;
+      transform: scale(1.1);
+    }
 
     svg {
       width: 14px;
@@ -559,20 +783,194 @@
     }
   }
 
-  &__footer {
-    padding: 0.5rem 0.75rem;
-    background: #f9f9f9;
-    border-top: 1px solid #e5e5e5;
+  // 卡片內容容器
+  &__inner {
+    position: relative;
+    padding: 10px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #fefefe 0%, #f5f5f5 100%);
+    overflow: hidden;
   }
 
-  &__type {
-    font-size: 0.75rem;
-    color: #999;
+  // 頂部區域
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  &__title-bar {
+    padding: 6px 12px;
+    border-radius: 8px 8px 8px 0;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+      border-radius: inherit;
+    }
+  }
+
+  &__name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  &__count {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: #C45D4A;
+    font-weight: 600;
+  }
+
+  &__count-label {
+    font-size: 0.875rem;
+  }
+
+  &__count-value {
+    font-size: 1.125rem;
+  }
+
+  // 圖片區域
+  &__image-frame {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 3px solid rgba(200, 200, 200, 0.5);
+    transition: border-color 0.3s ease;
+    
+    // 選中狀態
+    .collector-card--selected & {
+      border-color: rgba(245, 130, 32, 0.5);
+    }
+  }
+
+  &__image {
+    height: 140px;
+    background: linear-gradient(135deg, #ddd 0%, #eee 100%);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.1);
+    }
+  }
+
+  &__fallback {
+    width: 100%;
+    height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    background: linear-gradient(135deg, rgba(var(--element-color), 0.1) 0%, rgba(var(--element-color), 0.2) 100%);
+
+    svg {
+      width: 40px;
+      height: 40px;
+      opacity: 0.4;
+      color: #999;
+    }
+  }
+
+  &__selected-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(245, 130, 32, 0.5);
+    animation: badgePop 0.3s ease-out;
+
+    svg {
+      width: 18px;
+      height: 18px;
+  color: #fff;
+    }
+  }
+
+  // 底部元素標籤
+  &__footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+&__element {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+  }
+}
+
+@keyframes cardBorderShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+@keyframes badgePop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slotGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
   }
 }
 
 // ============================================
-// Game Fusing（烹飪動畫 - 淺色模式）
+// Game Fusing（五芒星融合動畫 - 5階段）
 // ============================================
 .game-fusing {
   display: flex;
@@ -581,126 +979,628 @@
   justify-content: center;
   min-height: 500px;
   padding: 2rem;
+  position: relative;
 }
 
-.cooking-animation {
-  text-align: center;
+// 融合舞台
+.fusion-stage {
+  position: relative;
+  width: 340px;
+  height: 340px;
+  margin-bottom: 2rem;
+}
 
+// 五芒星 SVG
+.fusion-pentagram {
+    position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  // 外圈
+  &__circle {
+    transform-origin: center;
+    animation: rotateCircle 8s linear infinite;
+    
+    &--shimmer {
+      animation: rotateCircle 8s linear infinite, circleShimmer 1s ease-in-out infinite;
+    }
+  }
+
+  // 五芒星線條（路徑總長約 1150px，使用 1500 確保完整閉合）
+  &__star {
+    stroke-dasharray: 1500;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 5px rgba(245, 130, 32, 0.5));
+    
+    // 準備階段：閃爍
+    &--shimmer {
+      animation: starShimmer 0.8s ease-in-out infinite;
+    }
+    
+    // 描繪階段：光線沿線條流動
+    &--trace {
+      stroke-dashoffset: 1500;
+      animation: starTrace 2s ease-in-out forwards;
+    }
+  }
+
+  // 中心光球（保留作為備用）
+  &__core {
+    transform-origin: center;
+    opacity: 0.6;
+    
+    &--pulse {
+      animation: corePulse 0.4s ease-in-out infinite;
+    }
+  }
+
+  // 中心 Logo
+  &__logo {
+    transform-origin: center;
+    filter: drop-shadow(0 0 10px rgba(245, 130, 32, 0.5));
+    
+    &--pulse {
+      animation: logoPulse 0.6s ease-in-out infinite;
+    }
+  }
+}
+
+// 微粒效果
+.fusion-particle {
+  transform-origin: center;
+  animation: particleFloat 2s ease-in-out infinite;
+  
+  @for $i from 1 through 5 {
+    &--#{$i} {
+      animation-delay: #{$i * 0.2}s;
+    }
+  }
+}
+
+// 卡槽
+.fusion-slot {
+  position: absolute;
+  width: 80px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+
+  &__empty {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed rgba(245, 130, 32, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+    
+    svg {
+      width: 30px;
+      height: 30px;
+      color: rgba(245, 130, 32, 0.3);
+    }
+    
+    &--shimmer {
+      animation: slotShimmer 0.8s ease-in-out infinite;
+    }
+  }
+}
+
+// 融合卡片（真實照片）
+.fusion-card {
+  --element-color: #F58220;
+  
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  
+  // 出現動畫
+  &--appear {
+    animation: cardAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  
+  // 分解動畫（延長至 2.5s）
+  &--dissolve {
+    animation: cardDissolve 2.5s ease-in forwards;
+  }
+
+  &__inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    padding: 4px 8px;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__image {
+    flex: 1;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__element {
+    padding: 3px;
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  // 分解粒子
+  &__particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--element-color);
+    animation: particleDissolve 1.2s ease-in forwards;
+    animation-delay: calc(var(--i) * 0.05s);
+    
+    @for $i from 1 through 8 {
+      &:nth-child(#{$i}) {
+        top: random(100) * 1%;
+        left: random(100) * 1%;
+      }
+    }
+  }
+}
+
+// 揭曉食譜卡牌
+.fusion-reveal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  gap: 1.5rem;
+  perspective: 1000px;
+
+  &__card-wrapper {
+    animation: cardEnter 0.5s ease-out forwards;
+    animation-delay: calc(var(--delay) * 0.2s);
+    opacity: 0;
+  }
+
+  &__card {
+    width: 160px;
+    height: 220px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: cardFlip 2s ease-in-out forwards;
+  }
+
+  &__front,
+  &__back {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  &__back {
+    background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transform: rotateY(0deg);
+
+    img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+
+    span {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.2em;
+    }
+  }
+
+  &__front {
+    background: #fff;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    
+    > img {
+      flex: 1;
+      object-fit: cover;
+      min-height: 0;
+    }
+  }
+
+  &__info {
+    padding: 0.5rem;
+    background: #fff;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: center;
+    color: #333;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__stars {
+    text-align: center;
+    
+    span {
+      color: #ddd;
+      font-size: 1rem;
+      
+      &.active {
+        color: #fbbf24;
+      }
+    }
+  }
+}
+
+// 狀態提示
+.fusion-status {
+  text-align: center;
+  
   &__title {
     font-size: 1.5rem;
     font-weight: 700;
     color: #333;
-    margin-top: 2rem;
+    margin-bottom: 1rem;
   }
 
-  &__subtitle {
-    color: #999;
-    margin-top: 0.5rem;
-  }
-}
-
-.cooking-pot {
-  position: relative;
-  width: 200px;
-  height: 160px;
-  margin: 0 auto;
-
-  &__lid {
-    position: absolute;
-    top: -10px;
-      left: 50%;
-    transform: translateX(-50%) translateY(-20px) rotate(-15deg);
-    width: 160px;
-    transition: all 0.5s ease-out;
-    z-index: 10;
-
-    &--closed {
-      transform: translateX(-50%) translateY(0) rotate(0);
-    }
-
-    svg {
-      width: 100%;
-      height: auto;
-    }
+  &__progress {
+    width: 200px;
+    height: 6px;
+    background: #e5e5e5;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0 auto;
   }
 
-  &__body {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 180px;
-    height: auto;
+  &__bar {
+    height: 100%;
+    background: linear-gradient(90deg, #F58220, #C45D4A);
+    border-radius: 3px;
+    transition: width 0.5s ease;
   }
 }
 
-.jumping-ingredient {
+// 爆發過渡效果
+.fusion-burst {
   position: absolute;
-  top: -60px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  opacity: 1;
-  animation: jumpIntoPot 0.6s ease-in forwards;
-  animation-play-state: paused;
-
-  &--jumped {
-    animation-play-state: running;
-  }
-
-  svg {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-@keyframes jumpIntoPot {
-  0% {
-    transform: translateX(-50%) translateY(0) scale(1);
-    opacity: 1;
-  }
-  30% {
-    transform: translateX(-50%) translateY(-30px) scale(1.2);
-  }
-  100% {
-    transform: translateX(-50%) translateY(60px) scale(0.3);
-    opacity: 0;
-  }
-}
-
-// 蒸氣動畫
-.steam-container {
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  z-index: 30;
   display: flex;
-  gap: 15px;
-}
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: burstFadeIn 0.3s ease-out;
 
-.steam {
-  animation: steamRise 2s ease-out infinite;
+  &__flash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, 
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(245, 130, 32, 0.3) 50%,
+      transparent 70%
+    );
+    animation: flashPulse 1s ease-out forwards;
+    z-index: -1;
+  }
 
-  &--1 { animation-delay: 0s; }
-  &--2 { animation-delay: 0.3s; }
-  &--3 { animation-delay: 0.6s; }
+  &__ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 3px solid rgba(245, 130, 32, 0.6);
+    animation: ringExpand 1s ease-out forwards;
 
-  svg {
-    width: 20px;
-    height: 30px;
+    &--1 {
+      width: 100px;
+      height: 100px;
+      animation-delay: 0s;
+    }
+
+    &--2 {
+      width: 100px;
+      height: 100px;
+      animation-delay: 0.2s;
+    }
+
+    &--3 {
+      width: 100px;
+      height: 100px;
+      animation-delay: 0.4s;
+    }
+  }
+
+  &__logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    animation: logoZoom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    filter: drop-shadow(0 0 20px rgba(245, 130, 32, 0.8));
+    z-index: 1;
+  }
+
+  &__text {
+    margin-top: 1.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #F58220;
+    text-shadow: 0 2px 10px rgba(245, 130, 32, 0.3);
+    animation: textPop 0.5s ease-out 0.3s both;
+    z-index: 1;
   }
 }
 
-@keyframes steamRise {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(0.8);
+@keyframes burstFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes flashPulse {
+  0% { 
+    opacity: 1;
+    transform: scale(0.5);
   }
   50% {
     opacity: 0.8;
   }
-  100% {
+  100% { 
     opacity: 0;
-    transform: translateY(-40px) scale(1.2);
+    transform: scale(2);
+  }
+}
+
+@keyframes ringExpand {
+  0% { 
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes logoZoom {
+  0% { 
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  100% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes textPop {
+  0% { 
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// ============================================
+// 動畫 Keyframes
+// ============================================
+
+@keyframes rotateCircle {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes circleShimmer {
+  0%, 100% { 
+    opacity: 0.5;
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 3;
+  }
+}
+
+@keyframes starShimmer {
+  0%, 100% { 
+    filter: drop-shadow(0 0 5px rgba(245, 130, 32, 0.5));
+    stroke-width: 4;
+  }
+  50% { 
+    filter: drop-shadow(0 0 15px rgba(245, 130, 32, 1));
+    stroke-width: 5;
+  }
+}
+
+@keyframes starTrace {
+  0% { 
+    stroke-dashoffset: 1500;
+    filter: drop-shadow(0 0 5px rgba(245, 130, 32, 0.5));
+  }
+  100% {
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 20px rgba(245, 130, 32, 1));
+  }
+}
+
+@keyframes particleFloat {
+  0%, 100% { 
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+@keyframes slotShimmer {
+  0%, 100% { 
+    border-color: rgba(245, 130, 32, 0.3);
+    background: rgba(255, 255, 255, 0.3);
+  }
+  50% { 
+    border-color: rgba(245, 130, 32, 0.6);
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+@keyframes cardAppear {
+  0% { 
+    opacity: 0;
+    transform: scale(0.3) rotateY(180deg);
+    filter: blur(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes cardDissolve {
+  0% { 
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.9);
+    filter: blur(2px);
+  }
+  100% { 
+    opacity: 0;
+    transform: scale(0.3) translateY(-50%);
+    filter: blur(10px);
+  }
+}
+
+@keyframes particleDissolve {
+  0% { 
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% { 
+    // 向中心移動（相對於容器）
+    transform: translate(
+      calc(50% - var(--i) * 10px), 
+      calc(50% - var(--i) * 8px)
+    ) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes corePulse {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes cardReveal {
+  0% { 
+    opacity: 0;
+    transform: scale(0) rotateY(180deg);
+    filter: blur(20px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) rotateY(0deg);
+    filter: blur(0);
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+    filter: blur(0);
+  }
+}
+
+// 卡片進場動畫
+@keyframes cardEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// 卡片翻轉動畫（2秒完成）
+@keyframes cardFlip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  30% {
+    transform: rotateY(0deg);
+  }
+  70% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+// Logo 脈動動畫
+@keyframes logoPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(245, 130, 32, 0.5));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 25px rgba(245, 130, 32, 0.8));
   }
 }
 
@@ -712,10 +1612,15 @@
   z-index: 1;
   padding: 2rem 0;
   min-height: 400px;
+  animation: resultFadeIn 0.5s ease-out;
 
   &__header {
     text-align: center;
     margin-bottom: 2rem;
+    
+    &--animated {
+      animation: headerSlideIn 0.6s ease-out;
+    }
   }
 
   &__icon {
@@ -723,6 +1628,7 @@
     height: 48px;
     color: #22c55e;
     margin-bottom: 1rem;
+    animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
   }
 
   &__title {
@@ -744,6 +1650,454 @@
   }
 }
 
+@keyframes resultFadeIn {
+  from { 
+    opacity: 0;
+  }
+  to { 
+    opacity: 1;
+  }
+}
+
+@keyframes headerSlideIn {
+  from { 
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes iconPop {
+  from { 
+    transform: scale(0);
+  }
+  to { 
+    transform: scale(1);
+  }
+}
+
+// 食譜收藏卡容器
+.recipe-collector-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
+
+// 食譜收藏卡（高質感設計）
+.recipe-collector {
+  position: relative;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: collectorEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  // 基礎邊框（銀色 - 普通級）
+  border: 4px solid transparent;
+  background: 
+    linear-gradient(145deg, #fefefe 0%, #f5f5f5 100%) padding-box,
+    linear-gradient(145deg, 
+      #c0c0c0 0%,
+      #fff 20%,
+      #a8a8a8 40%,
+      #fff 60%,
+      #b8b8b8 80%,
+      #e8e8e8 100%
+    ) border-box;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  // ============================================
+  // 稀有度等級
+  // ============================================
+
+  // 銀色 - 普通級（1-2星）
+  &--common {
+    background: 
+      linear-gradient(145deg, #fefefe 0%, #f5f5f5 100%) padding-box,
+      linear-gradient(145deg, 
+        #c0c0c0 0%,
+        #fff 15%,
+        #a0a0a0 30%,
+        #e0e0e0 50%,
+        #909090 70%,
+        #d0d0d0 85%,
+        #c0c0c0 100%
+      ) border-box;
+
+    .recipe-collector__glow {
+      background: radial-gradient(ellipse at center, 
+        rgba(192, 192, 192, 0.4) 0%, 
+        transparent 70%
+      );
+    }
+
+    .recipe-collector__title-bar {
+      background: linear-gradient(135deg, #8e8e8e 0%, #6e6e6e 100%);
+    }
+
+    .recipe-collector__star {
+      color: #a0a0a0;
+    }
+  }
+
+  // 金色 - 稀有級（3-4星）
+  &--rare {
+    background: 
+      linear-gradient(145deg, #fffef8 0%, #fdf8e8 100%) padding-box,
+      linear-gradient(145deg, 
+        #d4a017 0%,
+        #fff8dc 15%,
+        #b8860b 30%,
+        #ffd700 50%,
+        #daa520 70%,
+        #ffe066 85%,
+        #d4a017 100%
+      ) border-box;
+    box-shadow: 
+      0 4px 25px rgba(212, 160, 23, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    .recipe-collector__glow {
+      background: radial-gradient(ellipse at center, 
+        rgba(255, 215, 0, 0.5) 0%, 
+        transparent 70%
+      );
+    }
+
+    .recipe-collector__title-bar {
+      background: linear-gradient(135deg, #d4a017 0%, #b8860b 100%);
+    }
+
+    .recipe-collector__star {
+      color: #ffd700;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .recipe-collector__inner {
+      background: linear-gradient(180deg, #fffef8 0%, #fdf5e0 100%);
+    }
+  }
+
+  // 紫色 - 傳說級（5星）
+  &--legendary {
+    background: 
+      linear-gradient(145deg, #faf8ff 0%, #f0e8ff 100%) padding-box,
+      linear-gradient(90deg, 
+        #8b5cf6 0%,
+        #e0d0ff 15%,
+        #7c3aed 30%,
+        #c4b5fd 50%,
+        #6d28d9 70%,
+        #ddd6fe 85%,
+        #8b5cf6 100%
+      ) border-box;
+    background-size: 100% 100%, 200% 100%;
+    box-shadow: 
+      0 4px 30px rgba(139, 92, 246, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    animation: collectorEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+               legendaryShine 3s linear infinite;
+
+    .recipe-collector__glow {
+      background: radial-gradient(ellipse at center, 
+        rgba(139, 92, 246, 0.5) 0%, 
+        rgba(168, 85, 247, 0.3) 40%,
+        transparent 70%
+      );
+      opacity: 0.3;
+    }
+
+    .recipe-collector__title-bar {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    }
+
+    .recipe-collector__star {
+      color: #a78bfa;
+      text-shadow: 0 0 8px rgba(167, 139, 250, 0.8);
+      animation: starTwinkle 1.5s ease-in-out infinite;
+    }
+
+    .recipe-collector__inner {
+      background: linear-gradient(180deg, #faf8ff 0%, #ede9fe 100%);
+    }
+
+    &:hover {
+      box-shadow: 
+        0 20px 60px rgba(139, 92, 246, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  &:hover {
+    transform: translateY(-10px) rotateX(5deg);
+    box-shadow: 
+      0 20px 50px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    .recipe-collector__glow {
+      opacity: 0.4;
+    }
+
+    .recipe-collector__shine {
+      opacity: 1;
+      transform: translateX(200%);
+    }
+  }
+
+  // 懸停光暈
+  &__glow {
+    position: absolute;
+    inset: -15px;
+    border-radius: 24px;
+    background: radial-gradient(ellipse at center, 
+      rgba(245, 130, 32, 0.4) 0%, 
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: -1;
+    filter: blur(15px);
+  }
+
+  // 卡片內容
+  &__inner {
+    padding: 12px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+  }
+
+  // 頂部
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  &__title-bar {
+    background: linear-gradient(135deg, #F58220 0%, #C45D4A 100%);
+    padding: 8px 16px;
+    border-radius: 8px 8px 8px 0;
+    position: relative;
+    max-width: 70%;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+      border-radius: 8px 8px 0 0;
+    }
+  }
+
+  &__name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__stars {
+    display: flex;
+    gap: 2px;
+    color: #F58220;
+    font-size: 1rem;
+  }
+
+  &__star {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  // 圖片區域
+  &__image-frame {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 3px solid rgba(200, 200, 200, 0.5);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+
+    img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    opacity: 0;
+    transition: all 0.8s ease;
+  }
+
+  // 資訊區域
+  &__info {
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  &__desc {
+    font-size: 0.8125rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__tag {
+    font-size: 0.75rem;
+    color: #F58220;
+    font-weight: 600;
+  }
+
+  // 底部
+  &__footer {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    border-radius: 20px;
+    color: #666;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  // 缺少食材
+  &__missing {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #fff8f0 0%, #fff0e6 100%);
+    border-radius: 0 0 12px 12px;
+    border-top: 1px solid rgba(245, 130, 32, 0.15);
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: #F58220;
+      flex-shrink: 0;
+    }
+
+    > span {
+      font-size: 0.75rem;
+      color: #F58220;
+      font-weight: 500;
+    }
+  }
+
+  &__missing-link {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    background: #fff;
+    border: 1px solid #F58220;
+    border-radius: 12px;
+    color: #F58220;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      background: #F58220;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+@keyframes collectorEnter {
+  0% { 
+    opacity: 0;
+    transform: translateY(50px) scale(0.9) rotateX(-10deg);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0deg);
+  }
+}
+
+// 傳說級光澤流動
+@keyframes legendaryShine {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+// 星星閃爍
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
 // ============================================
 // Recipe Cards（食譜卡 - 淺色模式）
 // ============================================
@@ -751,6 +2105,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+  perspective: 1000px;
 
   @media (max-width: 992px) {
     grid-template-columns: repeat(2, 1fr);
@@ -916,7 +2271,7 @@
   gap: 0.5rem;
   padding: 1rem 2rem;
   border-radius: 30px;
-  font-size: 1rem;
+    font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -998,13 +2353,13 @@
       background: #C45D4A;
 
       svg {
-        color: #fff;
+  color: #fff;
       }
     }
-  }
+}
 
   &__header {
-    position: relative;
+  position: relative;
     height: 200px;
   }
 
@@ -1294,3 +2649,4 @@
     }
   }
 }
+

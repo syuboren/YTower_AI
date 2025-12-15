@@ -1,10 +1,17 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
 import { BreadcrumbComponent, RecipeCardComponent, CategoryCardComponent, CtaSectionComponent } from '../../../../shared/components';
 import { MockDataService } from '../../../../core/services/mock-data.service';
+
+// 五芒星頂點座標介面
+interface PentagramPoint {
+  x: number;
+  y: number;
+  angle: number;
+}
 
 // 食材卡牌介面
 interface IngredientCard {
@@ -72,7 +79,7 @@ const RECIPE_RESULTS: RecipeCard[] = [
   {
     id: 'R1',
     name: '日式咖哩飯',
-    stars: 4,
+    stars: 5,
     atk: 2800,
     def: 2200,
     desc: '濃郁的咖哩醬汁包裹著軟嫩的肉塊與蔬菜，是療癒人心的經典家常料理。',
@@ -158,32 +165,6 @@ const RECIPE_RESULTS: RecipeCard[] = [
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
-    // 食材跳入鍋子動畫
-    trigger('ingredientJump', [
-      state('waiting', style({ opacity: 1, transform: 'translateY(0) scale(1)' })),
-      state('jumping', style({ opacity: 0, transform: 'translateY(100px) scale(0.5)' })),
-      transition('waiting => jumping', [
-        animate('0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)', keyframes([
-          style({ transform: 'translateY(0) scale(1)', offset: 0 }),
-          style({ transform: 'translateY(-30px) scale(1.1)', offset: 0.3 }),
-          style({ transform: 'translateY(100px) scale(0.3)', opacity: 0, offset: 1 })
-        ]))
-      ])
-    ]),
-    // 鍋蓋動畫
-    trigger('lidAnimation', [
-      state('open', style({ transform: 'translateY(-20px) rotate(-15deg)' })),
-      state('closed', style({ transform: 'translateY(0) rotate(0)' })),
-      transition('open => closed', animate('0.4s ease-out')),
-      transition('closed => open', animate('0.3s ease-in'))
-    ]),
-    // 蒸氣動畫
-    trigger('steamAnimation', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(0) scale(0.5)' }),
-        animate('1s ease-out', style({ opacity: 1, transform: 'translateY(-30px) scale(1)' }))
-      ])
-    ]),
     // 卡片淡入動畫
     trigger('cardFadeIn', [
       transition(':enter', [
@@ -198,16 +179,24 @@ const RECIPE_RESULTS: RecipeCard[] = [
         animate('0.5s ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
       ])
     ]),
-    // 結果卡片動畫
-    trigger('recipeCardAnim', [
+    // 卡片進入卡槽動畫
+    trigger('slotFillIn', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(30px) scale(0.95)' }),
-        animate('0.4s ease-out', style({ opacity: 1, transform: 'translateY(0) scale(1)' }))
+        style({ opacity: 0, transform: 'scale(0.3) rotate(-180deg)' }),
+        animate('0.5s cubic-bezier(0.34, 1.56, 0.64, 1)', style({ opacity: 1, transform: 'scale(1) rotate(0)' }))
+      ])
+    ]),
+    // 融合吸入動畫
+    trigger('convergeAnimation', [
+      state('idle', style({ opacity: 1, transform: 'translate(0, 0) scale(1) rotate(0)' })),
+      state('converging', style({ opacity: 0, transform: 'translate(var(--tx), var(--ty)) scale(0) rotate(720deg)' })),
+      transition('idle => converging', [
+        animate('1.2s cubic-bezier(0.55, 0.055, 0.675, 0.19)')
       ])
     ])
   ]
 })
-export class AiAssistantPageComponent {
+export class AiAssistantPageComponent implements OnInit {
   private router = inject(Router);
   private mockDataService = inject(MockDataService);
   private cdr = inject(ChangeDetectorRef);
@@ -216,6 +205,18 @@ export class AiAssistantPageComponent {
     { label: 'AI 食譜', path: '/ai-assistant' },
     { label: 'AI 食譜生成助手' }
   ];
+
+  // 五芒星相關常數（使用百分比座標）
+  readonly PENTAGRAM_SIZE = 100; // 百分比基準
+  readonly PENTAGRAM_RADIUS = 40; // 半徑（百分比）
+  readonly PENTAGRAM_CENTER = { x: 50, y: 50 }; // 中心點（百分比）
+  readonly MAX_CARDS = 5; // 最大卡片數量
+
+  // 五芒星頂點座標（預計算）
+  pentagramPoints: PentagramPoint[] = [];
+
+  // 五芒星動畫狀態
+  pentagramDrawn = signal(false);
 
   // 遊戲狀態
   gameState = signal<GameState>('INPUT');
@@ -229,12 +230,6 @@ export class AiAssistantPageComponent {
   selectedCards = signal<IngredientCard[]>([]);
   imageErrors = signal<Set<number>>(new Set());
 
-  // 融合動畫狀態
-  cookingPhase = signal<'idle' | 'jumping' | 'cooking' | 'done'>('idle');
-  lidState = signal<'open' | 'closed'>('open');
-  showSteam = signal(false);
-  jumpingIngredientIndex = signal(0);
-
   // 結果相關
   recipeResults = signal<RecipeCard[]>([]);
   selectedRecipe = signal<RecipeCard | null>(null);
@@ -242,6 +237,80 @@ export class AiAssistantPageComponent {
   // 其他頁面資料
   recipes = computed(() => this.mockDataService.getRecipes().slice(0, 6));
   categories = computed(() => this.mockDataService.getCategories().slice(0, 6));
+
+  ngOnInit(): void {
+    // 計算五芒星頂點座標
+    this.calculatePentagramPoints();
+
+    // 延遲觸發五芒星繪製動畫
+    setTimeout(() => {
+      this.pentagramDrawn.set(true);
+      this.cdr.markForCheck();
+    }, 100);
+  }
+
+  // 計算五芒星5個頂點的座標
+  private calculatePentagramPoints(): void {
+    const points: PentagramPoint[] = [];
+    const startAngle = -90; // 從頂部開始（-90度）
+
+    for (let i = 0; i < 5; i++) {
+      const angle = startAngle + (i * 72); // 每個頂點相隔72度
+      const radian = (angle * Math.PI) / 180;
+      points.push({
+        x: this.PENTAGRAM_CENTER.x + this.PENTAGRAM_RADIUS * Math.cos(radian),
+        y: this.PENTAGRAM_CENTER.y + this.PENTAGRAM_RADIUS * Math.sin(radian),
+        angle: angle
+      });
+    }
+
+    this.pentagramPoints = points;
+  }
+
+  // 獲取五芒星 SVG 路徑（用於繪製星形線條）
+  // SVG viewBox 是 300x300，需要將百分比轉換為 SVG 座標
+  getPentagramPath(): string {
+    if (this.pentagramPoints.length !== 5) return '';
+
+    // 五芒星的連接順序：0->2->4->1->3->0（明確回到起點）
+    const order = [0, 2, 4, 1, 3];
+    const pathParts = order.map((idx, i) => {
+      const point = this.pentagramPoints[idx];
+      // 將百分比轉換為 SVG 座標（viewBox 300x300）
+      const svgX = (point.x / 100) * 300;
+      const svgY = (point.y / 100) * 300;
+      return i === 0 ? `M ${svgX} ${svgY}` : `L ${svgX} ${svgY}`;
+    });
+
+    // 使用 Z 指令明確閉合路徑，確保最後一段線條連回起點
+    return pathParts.join(' ') + ' Z';
+  }
+
+  // 獲取卡槽在特定位置的樣式
+  getSlotStyle(index: number): { left: string; top: string } {
+    if (index >= this.pentagramPoints.length) {
+      return { left: '50%', top: '50%' };
+    }
+
+    const point = this.pentagramPoints[index];
+    return {
+      left: `${point.x}px`,
+      top: `${point.y}px`
+    };
+  }
+
+  // 獲取卡片到中心的位移量（用於融合動畫）
+  getConvergeTransform(index: number): { tx: string; ty: string } {
+    if (index >= this.pentagramPoints.length) {
+      return { tx: '0px', ty: '0px' };
+    }
+
+    const point = this.pentagramPoints[index];
+    return {
+      tx: `${this.PENTAGRAM_CENTER.x - point.x}px`,
+      ty: `${this.PENTAGRAM_CENTER.y - point.y}px`
+    };
+  }
 
   // 新增食材到手牌
   handleAddIngredient(event?: Event): void {
@@ -293,7 +362,7 @@ export class AiAssistantPageComponent {
     };
   }
 
-  // 選擇/取消選擇卡牌
+  // 選擇/取消選擇卡牌（最多5張）
   toggleSelectCard(card: IngredientCard): void {
     if (this.gameState() !== 'INPUT') return;
 
@@ -302,61 +371,111 @@ export class AiAssistantPageComponent {
 
     if (isSelected) {
       this.selectedCards.update(cards => cards.filter(c => c.id !== card.id));
-    } else if (selected.length < 3) {
+    } else if (selected.length < this.MAX_CARDS) {
       this.selectedCards.update(cards => [...cards, card]);
     }
+    // 強制立即更新視圖
+    this.cdr.detectChanges();
+  }
+
+  // 從手牌中移除食材
+  removeCard(card: IngredientCard, event: Event): void {
+    event.stopPropagation(); // 防止觸發選擇事件
+
+    // 同時從手牌和已選擇中移除
+    this.hand.update(cards => cards.filter(c => c.id !== card.id));
+    this.selectedCards.update(cards => cards.filter(c => c.id !== card.id));
+
+    this.cdr.detectChanges();
   }
 
   isSelected(card: IngredientCard): boolean {
     return this.selectedCards().some(c => c.id === card.id);
   }
 
-  // 計算卡牌在容器中的位置
-  getCardPosition(index: number, total: number): { left: string; top: string } {
-    const positions = [
-      { left: '10%', top: '20%' },
-      { left: '60%', top: '10%' },
-      { left: '35%', top: '60%' }
-    ];
-    return positions[index] || positions[0];
+  // 獲取卡片在卡槽中的索引
+  getSlotIndex(card: IngredientCard): number {
+    return this.selectedCards().findIndex(c => c.id === card.id);
   }
 
-  // 開始融合（鍋子動畫）
+  // 融合動畫階段
+  // ready: 五芒星閃爍 + 空白卡槽
+  // summoning: 順時鐘逐一出現食材卡片
+  // tracing: 光線沿五芒星描繪（帶微粒效果）
+  // dissolving: 卡牌分解成粒子匯聚中心
+  // revealing: 食譜卡牌一張一張翻轉出現
+  fusionPhase = signal<'idle' | 'ready' | 'summoning' | 'tracing' | 'dissolving' | 'revealing'>('idle');
+
+  // 當前顯示的食材卡片數量（用於順時鐘逐一顯示）
+  visibleCardCount = signal(0);
+
+  // 當前顯示的食譜卡片數量（用於逐一翻轉顯示）
+  visibleRecipeCount = signal(0);
+
+  // 開始融合動畫
   startFusion(): void {
     if (this.selectedCards().length < 2) return;
 
     this.gameState.set('FUSING');
-    this.cookingPhase.set('jumping');
-    this.jumpingIngredientIndex.set(0);
-    this.cdr.markForCheck();
+    this.visibleCardCount.set(0);
+    this.visibleRecipeCount.set(0);
 
-    // 依序跳入食材
-    const jumpNextIngredient = (index: number) => {
-      if (index < this.selectedCards().length) {
-        this.jumpingIngredientIndex.set(index);
-        this.cdr.markForCheck();
-        setTimeout(() => jumpNextIngredient(index + 1), 600);
-      } else {
-        // 所有食材跳入後，蓋鍋蓋
+    // 階段一：準備（0.5s）- 五芒星閃爍 + 空白卡槽
+    this.fusionPhase.set('ready');
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      // 階段二：召喚（2s）- 順時鐘逐一出現食材卡片
+      this.fusionPhase.set('summoning');
+      this.cdr.detectChanges();
+
+      // 每隔一定時間顯示一張卡片
+      const cardCount = this.selectedCards().length;
+      const interval = 2000 / cardCount;
+
+      for (let i = 1; i <= cardCount; i++) {
         setTimeout(() => {
-          this.lidState.set('closed');
-          this.cookingPhase.set('cooking');
-          this.showSteam.set(true);
-          this.cdr.markForCheck();
+          this.visibleCardCount.set(i);
+          this.cdr.detectChanges();
+        }, interval * i);
+      }
 
-          // 烹飪完成
+      setTimeout(() => {
+        // 階段三：描繪（2s）- 光線沿五芒星描繪
+        this.fusionPhase.set('tracing');
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          // 階段四：融合（2.5s）- 卡牌分解成粒子匯聚（延長時間）
+          this.fusionPhase.set('dissolving');
+          this.cdr.detectChanges();
+
           setTimeout(() => {
-            this.cookingPhase.set('done');
+            // 階段五：爆發過渡 - 閃光效果後進入結果頁面
+            this.fusionPhase.set('revealing');
             const results = this.matchRecipes();
             this.recipeResults.set(results);
-            this.gameState.set('RESULT');
-            this.cdr.markForCheck();
-          }, 2000);
-        }, 500);
-      }
-    };
+            this.cdr.detectChanges();
 
-    setTimeout(() => jumpNextIngredient(0), 300);
+            // 爆發閃光過渡（1秒），然後進入結果頁面
+            setTimeout(() => {
+              this.gameState.set('RESULT');
+              this.fusionPhase.set('idle');
+              this.cdr.detectChanges();
+
+              // 在結果頁面逐一翻轉顯示食譜卡片
+              const recipeCount = results.length;
+              for (let i = 1; i <= recipeCount; i++) {
+                setTimeout(() => {
+                  this.visibleRecipeCount.set(i);
+                  this.cdr.detectChanges();
+                }, i * 800); // 每張間隔 0.8 秒
+              }
+            }, 1000); // 爆發過渡時間
+          }, 2500); // dissolving 階段
+        }, 2000);
+      }, 2000);
+    }, 500);
   }
 
   private matchRecipes(): RecipeCard[] {
@@ -385,9 +504,44 @@ export class AiAssistantPageComponent {
     this.selectedCards.set([]);
     this.recipeResults.set([]);
     this.selectedRecipe.set(null);
-    this.cookingPhase.set('idle');
-    this.lidState.set('open');
-    this.showSteam.set(false);
+    this.visibleCardCount.set(0);
+    this.visibleRecipeCount.set(0);
+    this.cdr.markForCheck();
+  }
+
+  // 隨機新增一種食材（不重複）
+  addRandomIngredient(): void {
+    // 取得目前手牌中已有的食材名稱
+    const existingNames = new Set(this.hand().map(card => card.name));
+
+    // 過濾掉已存在的食材
+    const availableIngredients = Object.keys(INGREDIENT_DB).filter(
+      name => !existingNames.has(name)
+    );
+
+    // 沒有可用的食材了
+    if (availableIngredients.length === 0) {
+      return;
+    }
+
+    // 隨機選擇一種食材
+    const randomIndex = Math.floor(Math.random() * availableIngredients.length);
+    const ingredientName = availableIngredients[randomIndex];
+    const dbEntry = INGREDIENT_DB[ingredientName];
+
+    const newCard: IngredientCard = {
+      id: Date.now(),
+      name: ingredientName,
+      img: dbEntry.img || '',
+      type: dbEntry.type || '食材',
+      element: dbEntry.element || '光',
+      atk: dbEntry.atk || 500,
+      def: dbEntry.def || 500,
+      gradient: dbEntry.gradient || 'from-gray-400 to-gray-600'
+    };
+
+    this.hand.update(cards => [...cards, newCard]);
+    this.cdr.detectChanges();
   }
 
   // 取得元素圖示顏色

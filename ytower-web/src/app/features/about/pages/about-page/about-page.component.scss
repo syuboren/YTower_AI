@@ -6,11 +6,64 @@
   }
 }
 
-// Hero Section
+// ============================================
+// Scroll Animation Classes
+// ============================================
+.scroll-animate {
+  opacity: 0;
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition-delay: var(--delay, 0s);
+  will-change: opacity, transform;
+
+  &.animate-in {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) !important;
+  }
+}
+
+// 從下往上飛入
+.fade-up {
+  transform: translateY(60px);
+}
+
+// 從左往右飛入
+.fade-right {
+  transform: translateX(-80px);
+}
+
+// 從右往左飛入
+.fade-left {
+  transform: translateX(80px);
+}
+
+// 縮放飛入
+.zoom-in {
+  transform: scale(0.85);
+}
+
+// 延遲類別
+.delay-1 { --delay: 0.15s; }
+.delay-2 { --delay: 0.3s; }
+.delay-3 { --delay: 0.45s; }
+.delay-4 { --delay: 0.6s; }
+
+// ============================================
+// Hero Section with Parallax Background
+// ============================================
 .about-hero {
-  padding: 2rem 0 4rem;
+  position: relative;
+  padding: 3rem 0 5rem;
   text-align: center;
-  background: linear-gradient(135deg, #fdf8f6 0%, #fff 100%);
+  overflow: hidden;
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(135deg, rgba(253, 248, 246, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%),
+      url('https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=1920') center/cover fixed;
+    z-index: -1;
+  }
 
   &__title {
     font-size: 2.5rem;
@@ -33,7 +86,9 @@
   }
 }
 
+// ============================================
 // Section Titles
+// ============================================
 .section-title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -48,6 +103,12 @@
     height: 3px;
     background: linear-gradient(90deg, #C45D4A, #F58220);
     margin-top: 0.5rem;
+    transition: width 0.5s ease;
+  }
+
+  .animate-in &::after {
+    animation: lineExpand 0.6s ease-out 0.3s forwards;
+    width: 0;
   }
 
   &--center {
@@ -59,6 +120,12 @@
   }
 }
 
+@keyframes lineExpand {
+  to {
+    width: 60px;
+  }
+}
+
 .section-text {
   font-size: 1rem;
   color: #666;
@@ -66,7 +133,9 @@
   margin: 0;
 }
 
+// ============================================
 // About Section (Mission & Vision)
+// ============================================
 .about-section {
   padding: 4rem 0;
 }
@@ -105,19 +174,32 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
 
     img {
       width: 100%;
       height: auto;
       display: block;
+      transition: transform 0.5s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
     }
   }
 }
 
+// ============================================
 // Core Values
+// ============================================
 .about-values {
   padding: 4rem 0;
-  background: #fdf8f6;
+  background: linear-gradient(180deg, #fdf8f6 0%, #fff 100%);
 }
 
 .values-grid {
@@ -134,6 +216,20 @@
 .value-card {
   text-align: center;
   padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(196, 93, 74, 0.15);
+
+    .value-card__icon {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 24px rgba(196, 93, 74, 0.25);
+    }
+  }
 
   &__icon {
     width: 80px;
@@ -142,10 +238,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
+    background: linear-gradient(135deg, #fff 0%, #fdf8f6 100%);
     border-radius: 50%;
     box-shadow: 0 4px 16px rgba(196, 93, 74, 0.15);
     color: #C45D4A;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
   &__title {
@@ -163,9 +260,12 @@
   }
 }
 
+// ============================================
 // Services
+// ============================================
 .about-services {
   padding: 4rem 0;
+  background: #fff;
 }
 
 .services-grid {
@@ -186,14 +286,39 @@
 .service-card {
   text-align: center;
   padding: 2rem 1.5rem;
-  background: #fff;
+  background: linear-gradient(145deg, #fff 0%, #fafafa 100%);
   border: 1px solid #eee;
-  border-radius: 12px;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 16px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #C45D4A, #F58220);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    border-color: transparent;
+
+    &::before {
+      transform: scaleX(1);
+    }
+
+    .service-card__icon {
+      color: #F58220;
+      transform: scale(1.15);
+    }
   }
 
   &__icon {
@@ -204,6 +329,7 @@
     align-items: center;
     justify-content: center;
     color: #C45D4A;
+    transition: color 0.3s ease, transform 0.3s ease;
   }
 
   &__title {
@@ -224,10 +350,22 @@
   }
 }
 
-// Brand Story
+// ============================================
+// Brand Story with Parallax
+// ============================================
 .about-story {
+  position: relative;
   padding: 4rem 0;
-  background: #fdf8f6;
+  overflow: hidden;
+
+  &__parallax {
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(180deg, rgba(253, 248, 246, 0.95) 0%, rgba(253, 248, 246, 0.9) 100%),
+      url('https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?w=1920') center/cover fixed;
+    z-index: -1;
+  }
 }
 
 .story-content {
@@ -246,4 +384,3 @@
     }
   }
 }
-

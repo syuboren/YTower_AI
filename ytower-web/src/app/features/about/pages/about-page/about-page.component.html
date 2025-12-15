@@ -6,9 +6,10 @@
 
   <!-- Hero Section -->
   <section class="about-hero">
+    <div class="about-hero__bg"></div>
     <div class="container">
-      <h1 class="about-hero__title">用美食連結彼此，用科技開啟未來</h1>
-      <p class="about-hero__description">
+      <h1 class="about-hero__title scroll-animate fade-up">用美食連結彼此，用科技開啟未來</h1>
+      <p class="about-hero__description scroll-animate fade-up delay-1">
         22 年來，專注於分享料理的樂趣。從電視節目起家，到數位化的食譜知識庫，
         我們總在探索新的方式，讓更多人能輕鬆享受烹飪、探索飲食的美好。
         今天，站在科技的浪尖上，我們選擇「擁抱最新的變革，開啟未來」。
@@ -20,7 +21,7 @@
   <!-- Mission & Vision -->
   <section class="about-section">
     <div class="container">
-      <div class="about-grid">
+      <div class="about-grid scroll-animate fade-right">
         <div class="about-grid__text">
           <h2 class="section-title">目標</h2>
           <p class="section-text">
@@ -34,7 +35,7 @@
         </div>
       </div>
 
-      <div class="about-grid about-grid--reverse">
+      <div class="about-grid about-grid--reverse scroll-animate fade-left">
         <div class="about-grid__text">
           <h2 class="section-title">展望</h2>
           <p class="section-text">
@@ -53,10 +54,10 @@
   <!-- Core Values -->
   <section class="about-values">
     <div class="container">
-      <h2 class="section-title section-title--center">核心價值</h2>
+      <h2 class="section-title section-title--center scroll-animate fade-up">核心價值</h2>
       <div class="values-grid">
-        @for (value of coreValues; track value.title) {
-          <div class="value-card">
+        @for (value of coreValues; track value.title; let i = $index) {
+          <div class="value-card scroll-animate fade-up" [style.--delay]="i * 0.15 + 's'">
             <div class="value-card__icon">
               @switch (value.icon) {
                 @case ('chef') {
@@ -90,10 +91,10 @@
   <!-- Services -->
   <section class="about-services">
     <div class="container">
-      <h2 class="section-title section-title--center">我們的服務</h2>
+      <h2 class="section-title section-title--center scroll-animate fade-up">我們的服務</h2>
       <div class="services-grid">
-        @for (service of services; track service.title) {
-          <div class="service-card">
+        @for (service of services; track service.title; let i = $index) {
+          <div class="service-card scroll-animate zoom-in" [style.--delay]="i * 0.1 + 's'">
             <div class="service-card__icon">
               @switch (service.icon) {
                 @case ('recipe') {
@@ -137,9 +138,10 @@
 
   <!-- Brand Story -->
   <section class="about-story">
+    <div class="about-story__parallax"></div>
     <div class="container">
-      <h2 class="section-title section-title--center">品牌故事</h2>
-      <div class="story-content">
+      <h2 class="section-title section-title--center scroll-animate fade-up">品牌故事</h2>
+      <div class="story-content scroll-animate fade-up delay-1">
         <p>
           自 1993 年起，楊桃美食一直專注於料理的三個概念：「真心教學」、「讓人輕鬆學」。我們因對烹飪的熱愛而創立，
           立志「用簡單懂得的語言教學做好菜」。
@@ -155,4 +157,3 @@
   <!-- CTA Section -->
   <app-cta-section />
 </div>
-

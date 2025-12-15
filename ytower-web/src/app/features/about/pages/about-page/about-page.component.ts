@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, AfterViewInit, ElementRef, inject, signal, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { BreadcrumbComponent, CtaSectionComponent } from '../../../../shared/components';
 
 @Component({
@@ -10,7 +10,10 @@ import { BreadcrumbComponent, CtaSectionComponent } from '../../../../shared/com
   imports: [CommonModule, BreadcrumbComponent, CtaSectionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AboutPageComponent {
+export class AboutPageComponent implements AfterViewInit {
+  private elementRef = inject(ElementRef);
+  private platformId = inject(PLATFORM_ID);
+
   breadcrumbItems = [
     { label: '關於我們' }
   ];
@@ -55,5 +58,33 @@ export class AboutPageComponent {
       description: '社群連結分享生活點滴及烹飪成果交流，讓您能和同好分享美食心得，學習更多烹飪技巧與創意菜單。'
     }
   ];
-}
 
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.initScrollAnimations();
+    }
+  }
+
+  private initScrollAnimations(): void {
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '0px 0px -100px 0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // 選擇需要動畫的元素
+    const animatedElements = this.elementRef.nativeElement.querySelectorAll('.scroll-animate');
+    animatedElements.forEach((el: Element) => {
+      observer.observe(el);
+    });
+  }
+}

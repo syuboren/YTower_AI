@@ -1,25 +1,22 @@
 <div class="recipe-detail-page">
   @if (recipe(); as recipe) {
-    <!-- AI Hero Banner -->
-    <section class="ai-banner">
-      <div class="container">
-        <div class="ai-banner__content">
-          <h2 class="ai-banner__title">AI 食譜生成助手</h2>
-          <p class="ai-banner__subtitle">從靈感到餐桌，只要一個步驟</p>
-          <a routerLink="/ai-assistant" class="ai-banner__btn">✨ 生成食譜</a>
-        </div>
-      </div>
-    </section>
-
     <div class="container">
       <app-breadcrumb [items]="breadcrumbItems()" />
 
       <!-- Recipe Header -->
-      <header class="recipe-header">
-        <h1 class="recipe-header__title">{{ recipe.title }}</h1>
+      <header class="recipe-header scroll-animate fade-up">
+        <div class="recipe-header__main">
+          <h1 class="recipe-header__title">{{ recipe.title }}</h1>
+          <div class="recipe-header__tags">
+            <span class="recipe-tag recipe-tag--difficulty">{{ getDifficultyLabel(recipe.difficulty) }}</span>
+            @for (style of recipe.cookingStyles; track style) {
+              <span class="recipe-tag recipe-tag--style">{{ style }}</span>
+            }
+          </div>
+        </div>
         
         <div class="recipe-header__actions">
-          <button class="action-btn" (click)="printRecipe()">
+          <button type="button" class="action-btn" (click)="printRecipe()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6 9 6 2 18 2 18 9"></polyline>
               <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -27,22 +24,27 @@
             </svg>
             列印食譜
           </button>
-          <button class="action-btn" (click)="copyLink()">
+          <button type="button" class="action-btn" (click)="copyLink()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
             複製連結
           </button>
-          <button class="action-btn action-btn--primary">
+          <button type="button" class="action-btn action-btn--primary">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
             </svg>
             收藏食譜
           </button>
-          <button class="action-btn" (click)="shareToFacebook()">
+          <button type="button" class="action-btn action-btn--social" (click)="shareToFacebook()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+            </svg>
+          </button>
+          <button type="button" class="action-btn action-btn--social" (click)="shareToLine()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-3.843 2.572-5.992zm-18.988-2.595c.129 0 .234.105.234.234v4.153c0 .129-.105.234-.234.234h-.947a.235.235 0 0 1-.234-.234v-4.153c0-.129.105-.234.234-.234h.947zm15.476 0c.129 0 .234.105.234.234v.947a.235.235 0 0 1-.234.234h-2.072v.792h2.072c.129 0 .234.105.234.234v.947a.235.235 0 0 1-.234.234h-2.072v.792h2.072c.129 0 .234.105.234.234v.947a.235.235 0 0 1-.234.234h-3.253a.235.235 0 0 1-.234-.234v-4.153c0-.129.105-.234.234-.234h3.253z"/>
             </svg>
           </button>
         </div>
@@ -54,6 +56,13 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
             烹飪時間：{{ recipe.cookingTime }} 分鐘
+          </span>
+          <span class="meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 4v6a6 6 0 0 0 12 0V4"></path>
+              <line x1="4" y1="21" x2="20" y2="21"></line>
+            </svg>
+            準備時間：{{ recipe.prepTime || 10 }} 分鐘
           </span>
           <span class="meta-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -74,15 +83,18 @@
             上傳日期：{{ recipe.uploadDate }}
           </span>
           <span class="meta-item meta-item--collect">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
             已有 1,234 人收藏這道食譜！你也來試試吧！
           </span>
         </div>
       </header>
 
       <!-- Recipe Description -->
-      <section class="recipe-intro">
+      <section class="recipe-intro scroll-animate fade-up">
         <div class="recipe-intro__image">
-          <img [src]="recipe.imageUrl" [alt]="recipe.title">
+          <img [src]="recipe.imageUrl" [alt]="recipe.title" loading="lazy">
         </div>
         <p class="recipe-intro__description">{{ recipe.description }}</p>
       </section>
@@ -91,14 +103,9 @@
       <div class="recipe-content">
         <div class="recipe-content__main">
           <!-- Ingredients -->
-          <section class="ingredients-section">
+          <section class="ingredients-section scroll-animate fade-right">
             <div class="section-header">
               <h2 class="section-title">材料</h2>
-              <div class="servings-control">
-                <button class="servings-btn" (click)="decreaseServings()">−</button>
-                <span class="servings-value">{{ servings() }} 人份</span>
-                <button class="servings-btn" (click)="increaseServings()">+</button>
-              </div>
             </div>
 
             <div class="ingredients-table">
@@ -130,12 +137,12 @@
 
           <!-- Kitchenware -->
           @if (recipe.kitchenware && recipe.kitchenware.length > 0) {
-            <section class="kitchenware-section">
+            <section class="kitchenware-section scroll-animate fade-right">
               <h2 class="section-title">使用器具</h2>
               <div class="kitchenware-list">
                 @for (item of recipe.kitchenware; track item.id) {
                   <div class="kitchenware-item">
-                    <span class="kitchenware-name">Woody 木質調磨石陶瓷瓶底深鍋 26cm</span>
+                    <span class="kitchenware-name">{{ item.name }}</span>
                     <a [href]="item.purchaseUrl" target="_blank" class="kitchenware-link">立即選購</a>
                   </div>
                 }
@@ -144,7 +151,7 @@
           }
 
           <!-- Steps -->
-          <section class="steps-section">
+          <section class="steps-section scroll-animate fade-up">
             <h2 class="section-title">製作步驟</h2>
             <ol class="steps-list">
               @for (step of recipe.steps; track step.stepNumber) {
@@ -167,31 +174,90 @@
           </section>
 
           <!-- Tags -->
-          <section class="tags-section">
+          <section class="tags-section scroll-animate fade-up">
             <h3 class="tags-title">此食譜標籤</h3>
-            <div class="tags-list">
-              @for (tag of recipe.tags; track tag) {
-                <span class="tag">{{ tag }}</span>
-              }
+            <div class="tags-group">
+              <span class="tags-label">難易度：</span>
+              <div class="tags-list">
+                <span class="tag tag--active">簡單</span>
+                <span class="tag">中等</span>
+                <span class="tag">困難</span>
+              </div>
+            </div>
+            <div class="tags-group">
+              <span class="tags-label">類型：</span>
+              <div class="tags-list">
+                @for (tag of recipe.tags; track tag) {
+                  <span class="tag tag--active">{{ tag }}</span>
+                }
+              </div>
+            </div>
+            <div class="tags-group">
+              <span class="tags-label">烹飪時間：</span>
+              <div class="tags-list">
+                <span class="tag">1分鐘</span>
+                <span class="tag tag--active">20分鐘</span>
+                <span class="tag">1小時+</span>
+              </div>
+            </div>
+            <div class="tags-group">
+              <span class="tags-label">食材：</span>
+              <div class="tags-list">
+                <span class="tag tag--active">豆腐</span>
+                <span class="tag tag--active">辣椒</span>
+                <span class="tag tag--active">花椒</span>
+              </div>
             </div>
           </section>
         </div>
 
         <!-- Video Section -->
-        <aside class="recipe-content__video">
+        <aside class="recipe-content__video scroll-animate fade-left">
           <div class="video-wrapper">
-            <img [src]="recipe.imageUrl" [alt]="recipe.title">
-            <button class="video-play-btn">
+            <img [src]="recipe.imageUrl" [alt]="recipe.title" loading="lazy">
+            <button type="button" class="video-play-btn">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
             </button>
           </div>
+
+          <!-- Nutrition Info -->
+          <div class="nutrition-card">
+            <h3 class="nutrition-card__title">營養資訊</h3>
+            <p class="nutrition-card__subtitle">每份含量（{{ recipe.servings }}人份）</p>
+            <div class="nutrition-grid">
+              <div class="nutrition-item">
+                <span class="nutrition-value">{{ nutritionInfo().calories }}</span>
+                <span class="nutrition-label">卡路里</span>
+              </div>
+              <div class="nutrition-item">
+                <span class="nutrition-value">{{ nutritionInfo().protein }}g</span>
+                <span class="nutrition-label">蛋白質</span>
+              </div>
+              <div class="nutrition-item">
+                <span class="nutrition-value">{{ nutritionInfo().fat }}g</span>
+                <span class="nutrition-label">脂肪</span>
+              </div>
+              <div class="nutrition-item">
+                <span class="nutrition-value">{{ nutritionInfo().carbs }}g</span>
+                <span class="nutrition-label">碳水</span>
+              </div>
+              <div class="nutrition-item">
+                <span class="nutrition-value">{{ nutritionInfo().fiber }}g</span>
+                <span class="nutrition-label">纖維</span>
+              </div>
+              <div class="nutrition-item">
+                <span class="nutrition-value">{{ nutritionInfo().sodium }}mg</span>
+                <span class="nutrition-label">鈉</span>
+              </div>
+            </div>
+          </div>
         </aside>
       </div>
 
       <!-- Rating Section -->
-      <section class="rating-section">
+      <section class="rating-section scroll-animate fade-up">
         <div class="rating-card">
           <div class="rating-card__existing">
             <h3>食譜評價</h3>
@@ -210,11 +276,16 @@
             <div class="rating-input">
               @for (star of [1,2,3,4,5]; track star) {
                 <button 
+                  type="button"
                   class="star-btn" 
                   [class.star-btn--active]="star <= userRating()"
                   (click)="setRating(star)"
                 >
-                  ★
+                  @if (star <= userRating()) {
+                    ★
+                  } @else {
+                    ☆
+                  }
                 </button>
               }
             </div>
@@ -223,8 +294,10 @@
       </section>
 
       <!-- Related Recipes -->
-      <section class="related-section">
-        <h2 class="section-title">其他相似食譜推薦</h2>
+      <section class="related-section scroll-animate fade-up">
+        <div class="section-header-row">
+          <h2 class="section-title">其他相似食譜推薦</h2>
+        </div>
         <div class="related-grid">
           @for (related of relatedRecipes(); track related.id) {
             <app-recipe-card
@@ -234,6 +307,56 @@
               [cookingTime]="related.cookingTime"
               [rating]="related.rating"
             />
+          }
+        </div>
+      </section>
+
+      <!-- Recommended Products -->
+      <section class="products-section scroll-animate fade-up">
+        <div class="section-header-row">
+          <h2 class="section-title">推薦！此食譜適用之廚具！</h2>
+        </div>
+        <div class="products-scroll">
+          @for (product of recommendedProducts(); track product.id) {
+            <a [href]="product.purchaseUrl" target="_blank" class="product-card">
+              <div class="product-card__image">
+                <img [src]="product.imageUrl" [alt]="product.name" loading="lazy">
+                @if (product.isHot) {
+                  <span class="product-card__badge">熱銷</span>
+                }
+              </div>
+              <div class="product-card__content">
+                <h4 class="product-card__name">{{ product.name }}</h4>
+                <div class="product-card__price">
+                  @if (product.originalPrice) {
+                    <span class="product-card__original">NT$ {{ product.originalPrice }}</span>
+                  }
+                  <span class="product-card__current">NT$ {{ product.price }}</span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </section>
+
+      <!-- Featured Themes -->
+      <section class="themes-section scroll-animate fade-up">
+        <div class="section-header-row">
+          <h2 class="section-title">推薦食譜主題</h2>
+        </div>
+        <div class="themes-grid">
+          @for (theme of featuredThemes(); track theme.slug) {
+            <a [routerLink]="['/recipes', 'theme', theme.slug]" class="theme-card">
+              <div class="theme-card__image">
+                <img [src]="theme.imageUrl" [alt]="theme.title" loading="lazy">
+                <div class="theme-card__overlay"></div>
+              </div>
+              <div class="theme-card__content">
+                <h3 class="theme-card__title">{{ theme.title }}</h3>
+                <p class="theme-card__desc">{{ theme.description }}</p>
+                <span class="theme-card__link">查看食譜主題 →</span>
+              </div>
+            </a>
           }
         </div>
       </section>
@@ -250,4 +373,3 @@
     </div>
   }
 </div>
-

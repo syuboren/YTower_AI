@@ -1,8 +1,17 @@
-import { Component, ChangeDetectionStrategy, inject, input, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, input, computed, signal, AfterViewInit, ElementRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BreadcrumbComponent, RecipeCardComponent, CtaSectionComponent } from '../../../../shared/components';
 import { MockDataService } from '../../../../core/services/mock-data.service';
+
+interface NutritionInfo {
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  fiber: number;
+  sodium: number;
+}
 
 @Component({
   standalone: true,
@@ -12,8 +21,10 @@ import { MockDataService } from '../../../../core/services/mock-data.service';
   imports: [CommonModule, RouterLink, BreadcrumbComponent, RecipeCardComponent, CtaSectionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RecipeDetailPageComponent {
+export class RecipeDetailPageComponent implements AfterViewInit {
   private mockDataService = inject(MockDataService);
+  private elementRef = inject(ElementRef);
+  private platformId = inject(PLATFORM_ID);
   
   id = input.required<string>();
 
@@ -34,9 +45,66 @@ export class RecipeDetailPageComponent {
     return this.mockDataService.getRecipes().slice(0, 4);
   });
 
+  // 推薦廚具（使用產品資料）
+  recommendedProducts = computed(() => {
+    return this.mockDataService.getProducts().slice(0, 4);
+  });
+
+  // 推薦食譜主題
+  featuredThemes = computed(() => {
+    return this.mockDataService.featuredThemes;
+  });
+
+  // 營養資訊（模擬資料）
+  nutritionInfo = computed<NutritionInfo>(() => {
+    return {
+      calories: 285,
+      protein: 18,
+      fat: 15,
+      carbs: 22,
+      fiber: 3,
+      sodium: 680
+    };
+  });
+
   servings = signal(2);
   completedSteps = signal<number[]>([]);
   userRating = signal(0);
+
+  // 難易度映射
+  difficultyMap: Record<string, string> = {
+    easy: '作法簡單',
+    medium: '一般',
+    hard: '較難'
+  };
+
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.initScrollAnimations();
+    }
+  }
+
+  private initScrollAnimations(): void {
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '0px 0px -100px 0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    const animatedElements = this.elementRef.nativeElement.querySelectorAll('.scroll-animate');
+    animatedElements.forEach((el: Element) => {
+      observer.observe(el);
+    });
+  }
 
   decreaseServings(): void {
     const current = this.servings();
@@ -84,5 +152,9 @@ export class RecipeDetailPageComponent {
   printRecipe(): void {
     window.print();
   }
-}
 
+  getDifficultyLabel(difficulty: string | undefined): string {
+    if (!difficulty) return '作法簡單';
+    return this.difficultyMap[difficulty] || '作法簡單';
+  }
+}

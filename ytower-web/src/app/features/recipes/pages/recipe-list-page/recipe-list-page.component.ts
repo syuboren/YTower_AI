@@ -62,7 +62,7 @@ export class RecipeListPageComponent implements AfterViewInit, OnInit {
   selectedStyle = signal<string>('');
 
   // 無限滾動相關（搜尋結果）
-  pageSize = 6;
+  pageSize = 20; // 一次載入 20 筆
   currentPage = signal(1);
   isLoading = signal(false);
 

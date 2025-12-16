@@ -1,1 +1,0 @@
-import"./chunk-2VMXMS7J.js";var o=[{path:"",loadComponent:()=>import("./chunk-EQBXIYLN.js").then(t=>t.AiAssistantPageComponent),title:"AI \u98DF\u8B5C\u52A9\u624B | \u694A\u6843\u7F8E\u98DF\u7DB2"}];export{o as aiAssistantRoutes};

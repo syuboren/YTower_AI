@@ -179,10 +179,43 @@ export class RecipeListPageComponent implements AfterViewInit, OnInit {
     { value: 'korean', label: '韓式' }
   ];
 
-  // Bento 卡片大小計算
+  // Bento 卡片大小計算（動態調整避免空白）
   getBentoSize(index: number): string {
+    const total = this.displayedRecipes().length;
+    const columns = 4; // Grid 列數
+    
+    // 基本 pattern：large(2x2), normal, normal, wide(2x1), normal, tall(1x2), normal, normal
+    // 每個 pattern 循環佔用的格子數：4 + 1 + 1 + 2 + 1 + 2 + 1 + 1 = 13 格
     const patterns = ['large', 'normal', 'normal', 'wide', 'normal', 'tall', 'normal', 'normal'];
-    return patterns[index % patterns.length];
+    const patternSize = patterns.length;
+    
+    // 計算當前索引在 pattern 中的位置
+    const patternIndex = index % patternSize;
+    const baseSize = patterns[patternIndex];
+    
+    // 計算剩餘卡片數
+    const remaining = total - index;
+    
+    // 如果剩餘卡片數較少，動態調整以避免空白
+    // large 需要至少 4 張卡片才能完整填充一個區塊（2x2 + 周圍的空間）
+    // wide 需要至少 2 張卡片
+    // tall 需要至少 2 張卡片
+    if (remaining <= 4) {
+      // 最後幾張卡片全部使用 normal，確保填滿
+      return 'normal';
+    }
+    
+    if (remaining <= 6 && baseSize === 'large') {
+      // 剩餘卡片不多時，不使用 large
+      return 'normal';
+    }
+    
+    if (remaining <= 3 && (baseSize === 'wide' || baseSize === 'tall')) {
+      // 剩餘卡片不多時，不使用 wide 或 tall
+      return 'normal';
+    }
+    
+    return baseSize;
   }
 
   ngOnInit(): void {

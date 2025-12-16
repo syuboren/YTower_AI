@@ -182,36 +182,25 @@ export class RecipeListPageComponent implements AfterViewInit, OnInit {
   // Bento 卡片大小計算（動態調整避免空白）
   getBentoSize(index: number): string {
     const total = this.displayedRecipes().length;
-    const columns = 4; // Grid 列數
     
     // 基本 pattern：large(2x2), normal, normal, wide(2x1), normal, tall(1x2), normal, normal
-    // 每個 pattern 循環佔用的格子數：4 + 1 + 1 + 2 + 1 + 2 + 1 + 1 = 13 格
     const patterns = ['large', 'normal', 'normal', 'wide', 'normal', 'tall', 'normal', 'normal'];
-    const patternSize = patterns.length;
-    
-    // 計算當前索引在 pattern 中的位置
-    const patternIndex = index % patternSize;
+    const patternIndex = index % patterns.length;
     const baseSize = patterns[patternIndex];
     
-    // 計算剩餘卡片數
+    // 計算剩餘卡片數（包含當前卡片）
     const remaining = total - index;
     
-    // 如果剩餘卡片數較少，動態調整以避免空白
-    // large 需要至少 4 張卡片才能完整填充一個區塊（2x2 + 周圍的空間）
-    // wide 需要至少 2 張卡片
-    // tall 需要至少 2 張卡片
-    if (remaining <= 4) {
-      // 最後幾張卡片全部使用 normal，確保填滿
-      return 'normal';
+    // 只在最後 2 張卡片時調整，避免空白
+    // 如果是最後 1-2 張，且原本要用 wide 或 large，改用 normal
+    if (remaining <= 2) {
+      if (baseSize === 'large' || baseSize === 'wide') {
+        return 'normal';
+      }
     }
     
-    if (remaining <= 6 && baseSize === 'large') {
-      // 剩餘卡片不多時，不使用 large
-      return 'normal';
-    }
-    
-    if (remaining <= 3 && (baseSize === 'wide' || baseSize === 'tall')) {
-      // 剩餘卡片不多時，不使用 wide 或 tall
+    // 如果是最後 1 張且要用 tall，改用 normal
+    if (remaining === 1 && baseSize === 'tall') {
       return 'normal';
     }
     

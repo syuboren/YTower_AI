@@ -1,0 +1,1 @@
+import"./chunk-2VMXMS7J.js";var o=[{path:"",loadComponent:()=>import("./chunk-WJJ7SAYW.js").then(t=>t.ContactPageComponent),title:"\u806F\u7D61\u6211\u5011 | \u694A\u6843\u7F8E\u98DF\u7DB2"}];export{o as contactRoutes};

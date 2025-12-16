@@ -1,1 +1,0 @@
-import"./chunk-2VMXMS7J.js";var o=[{path:"",loadComponent:()=>import("./chunk-RFGSWM2C.js").then(t=>t.NewsListPageComponent),title:"\u6700\u65B0\u6D88\u606F | \u694A\u6843\u7F8E\u98DF\u7DB2"},{path:":id",loadComponent:()=>import("./chunk-XEGGLAOJ.js").then(t=>t.NewsDetailPageComponent),title:"\u6700\u65B0\u6D88\u606F | \u694A\u6843\u7F8E\u98DF\u7DB2"}];export{o as newsRoutes};
